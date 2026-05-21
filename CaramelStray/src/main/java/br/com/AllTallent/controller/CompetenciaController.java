@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.AllTallent.dto.CompetenciaDTO;
+import br.com.AllTallent.dto.CompetenciaRequestDTO;
 import br.com.AllTallent.model.Competencia;
 import br.com.AllTallent.repository.CompetenciaRepository;
 
@@ -45,19 +46,23 @@ public class CompetenciaController {
     }
 
     @PostMapping
-    public ResponseEntity<Competencia> criar(@RequestBody Competencia nova) {
+    public ResponseEntity<Competencia> criar(@RequestBody CompetenciaRequestDTO nova) {
         if (competenciaRepository.existsByNomeIgnoreCase(nova.getNome())) {
             return ResponseEntity.badRequest().build();
         }
-        Competencia salva = competenciaRepository.save(nova);
+        Competencia competencia = new Competencia();
+        competencia.setNome(nova.getNome());
+        competencia.setCategoria(nova.getCategoria());
+        Competencia salva = competenciaRepository.save(competencia);
         return ResponseEntity.created(URI.create("/api/competencia/" + salva.getCodigo())).body(salva);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Competencia> atualizar(@PathVariable Integer id, @RequestBody Competencia atualizada) {
+    public ResponseEntity<Competencia> atualizar(@PathVariable Integer id, @RequestBody CompetenciaRequestDTO atualizada) {
         return competenciaRepository.findById(id)
                 .map(c -> {
                     c.setNome(atualizada.getNome());
+                    c.setCategoria(atualizada.getCategoria());
                     Competencia salva = competenciaRepository.save(c);
                     return ResponseEntity.ok(salva);
                 })
