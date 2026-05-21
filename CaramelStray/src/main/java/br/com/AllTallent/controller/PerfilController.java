@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.AllTallent.dto.PerfilRequestDTO;
 import br.com.AllTallent.model.Perfil;
 import br.com.AllTallent.repository.PerfilRepository;
 
@@ -25,7 +26,10 @@ public class PerfilController {
 
     
     @PostMapping
-    public ResponseEntity<Perfil> createPerfil(@RequestBody Perfil perfil) {
+    public ResponseEntity<Perfil> createPerfil(@RequestBody PerfilRequestDTO dto) {
+        Perfil perfil = new Perfil();
+        perfil.setNome(dto.getNome());
+        perfil.setDescricao(dto.getDescricao());
         Perfil novoPerfil = perfilRepository.save(perfil);
         return new ResponseEntity<>(novoPerfil, HttpStatus.CREATED);
     }
