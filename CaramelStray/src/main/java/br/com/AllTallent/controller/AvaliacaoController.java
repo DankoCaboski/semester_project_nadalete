@@ -44,7 +44,6 @@ public class AvaliacaoController {
              return ResponseEntity.badRequest().body(null); 
         } catch (Exception e) {
             System.err.println("Erro ao criar avaliação: " + e.getMessage()); 
-            e.printStackTrace(); 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -91,7 +90,6 @@ public class AvaliacaoController {
              return ResponseEntity.badRequest().body("Erro ao salvar resposta: " + e.getMessage());
         } catch (Exception e) {
             System.err.println("Erro interno ao salvar resposta: " + e.getMessage());
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao salvar resposta.");
         }
     }
@@ -134,7 +132,6 @@ public class AvaliacaoController {
             return ResponseEntity.notFound().build();
         } catch (Exception e) {
              System.err.println("Erro interno ao salvar revisão: " + e.getMessage());
-             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao salvar revisão.");
         }
     }

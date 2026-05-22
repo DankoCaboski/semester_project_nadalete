@@ -70,7 +70,6 @@ public class DashboardController {
         } catch (Exception e) {
             // --- CAPTURA DO ERRO ---
             System.out.println(">>>  ERRO CAPTURADO NO CONTROLLER ");
-            e.printStackTrace(); // Imprime o erro no terminal para debug
             return ResponseEntity.internalServerError().body("Erro interno no servidor: " + e.getMessage());
         }
     }
