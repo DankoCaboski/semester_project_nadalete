@@ -56,9 +56,11 @@ class DashboardControllerTest {
     // -------------------------------------------------------------------------
 
     @Test
-    void getDashboardData_deveRetornar403_quandoNaoAutenticado() throws Exception {
+    void getDashboardData_deveRetornar401_quandoNaoAutenticado() throws Exception {
+        // Sem credenciais → Spring Security responde 401 (AuthenticationEntryPoint).
+        // 403 só ocorreria se o usuário estivesse autenticado mas sem permissão.
         mockMvc.perform(get("/api/dashboard"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isUnauthorized());
 
         verify(dashboardService, never()).getDashboardData(any());
     }
