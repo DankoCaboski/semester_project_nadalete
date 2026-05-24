@@ -20,7 +20,7 @@ import br.com.AllTallent.repository.AvaliacaoRepository;
 import br.com.AllTallent.repository.FuncionarioRepository;
 import br.com.AllTallent.repository.RespostaColaboradorRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional; 
@@ -28,19 +28,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class DashboardService {
-    
-    @Autowired
-    private FuncionarioRepository funcionarioRepo;
 
-    @Autowired
-    private AvaliacaoRepository avaliacaoRepo;
-
-    @Autowired
-    private AvaliacaoFuncionarioRepository avaliacaoFuncionarioRepo;
-
-    @Autowired
-    private RespostaColaboradorRepository respostaColaboradorRepo;
+    private final FuncionarioRepository funcionarioRepo;
+    private final AvaliacaoRepository avaliacaoRepo;
+    private final AvaliacaoFuncionarioRepository avaliacaoFuncionarioRepo;
+    private final RespostaColaboradorRepository respostaColaboradorRepo;
 
     // --- MÉTODOS AUXILIARES NOVOS (Vieram do Git) ---
     public List<AreaQuantidadeDTO> getTotalColaboradoresArea() {
