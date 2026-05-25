@@ -26,7 +26,10 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DashboardServiceTest {
@@ -38,12 +41,15 @@ class DashboardServiceTest {
 
     @InjectMocks private DashboardService dashboardService;
 
-    // Helper: cria um MesQuantidadeProjection mockado
+    // Helper: cria um MesQuantidadeProjection via classe anônima.
+    // Evita Mockito.mock() inline, que com STRICT_STUBS pode lançar
+    // UnnecessaryStubbingException se o MockitoSession considerar os
+    // stubs não utilizados durante a verificação pós-teste.
     private MesQuantidadeProjection projecao(String mes, long qtd) {
-        MesQuantidadeProjection p = mock(MesQuantidadeProjection.class);
-        when(p.getMes()).thenReturn(mes);
-        when(p.getQuantidade()).thenReturn(qtd);
-        return p;
+        return new MesQuantidadeProjection() {
+            @Override public String getMes()      { return mes; }
+            @Override public Long   getQuantidade() { return qtd; }
+        };
     }
 
     // -------------------------------------------------------------------------
