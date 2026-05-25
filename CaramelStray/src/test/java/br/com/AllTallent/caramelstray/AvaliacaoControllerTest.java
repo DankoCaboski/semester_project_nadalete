@@ -177,9 +177,6 @@ class AvaliacaoControllerTest {
         verify(avaliacaoService, never()).listarTodasAvaliacoes();
     }
 
-    // -------------------------------------------------------------------------
-    // GET /api/avaliacoes/{id}
-    // -------------------------------------------------------------------------
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -206,10 +203,6 @@ class AvaliacaoControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    // -------------------------------------------------------------------------
-    // GET /api/avaliacoes/{id}/instancias
-    // -------------------------------------------------------------------------
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void buscarInstanciasPorAvaliacao_deveRetornar200ComLista() throws Exception {
@@ -230,9 +223,6 @@ class AvaliacaoControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    // -------------------------------------------------------------------------
-    // POST /api/avaliacoes/respostas
-    // -------------------------------------------------------------------------
 
     @Test
     @WithMockUser
