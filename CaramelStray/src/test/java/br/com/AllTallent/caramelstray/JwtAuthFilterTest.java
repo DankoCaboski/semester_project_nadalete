@@ -55,10 +55,6 @@ class JwtAuthFilterTest {
                 .build();
     }
 
-    // =========================================================================
-    // Sem header Authorization — não deve interferir no fluxo
-    // =========================================================================
-
     @Test
     void semHeaderAuthorization_encaminhaRequisicaoAdiante() throws Exception {
         MockHttpServletRequest request  = new MockHttpServletRequest();
@@ -82,9 +78,6 @@ class JwtAuthFilterTest {
         assertNull(SecurityContextHolder.getContext().getAuthentication());
     }
 
-    // =========================================================================
-    // Token JWT válido — deve setar autenticação no contexto
-    // =========================================================================
 
     @Test
     void tokenValido_setaAutenticacaoNoContexto() throws Exception {
@@ -143,9 +136,6 @@ class JwtAuthFilterTest {
         verify(filterChain).doFilter(request, response);
     }
 
-    // =========================================================================
-    // Exceções — o filtro trata internamente sem propagar
-    // =========================================================================
 
     @Test
     void jwtInvalido_retorna401_semPropagar() throws Exception {
@@ -181,9 +171,6 @@ class JwtAuthFilterTest {
         verify(filterChain, never()).doFilter(any(), any());
     }
 
-    // =========================================================================
-    // Token válido mas autenticação já presente no contexto — não reprocessa
-    // =========================================================================
 
     @Test
     void autenticacaoJaExistente_naoReprocessaToken() throws Exception {

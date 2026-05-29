@@ -39,9 +39,6 @@ class JwtServiceTest {
                 .build();
     }
 
-    // =========================================================================
-    // generateToken
-    // =========================================================================
 
     @Test
     void generateToken_retornaTokenNaoNuloNemVazio() {
@@ -65,9 +62,6 @@ class JwtServiceTest {
         assertEquals(3, token.split("\\.").length);
     }
 
-    // =========================================================================
-    // extractUsername
-    // =========================================================================
 
     @Test
     void extractUsername_retornaEmailCorreto() {
@@ -79,9 +73,6 @@ class JwtServiceTest {
         assertEquals("usuario@test.com", username);
     }
 
-    // =========================================================================
-    // isTokenValid
-    // =========================================================================
 
     @Test
     void isTokenValid_retornaTrue_quandoTokenDoMesmoUsuario() {
@@ -100,9 +91,6 @@ class JwtServiceTest {
         assertFalse(jwtService.isTokenValid(token, outro));
     }
 
-    // =========================================================================
-    // extractClaim
-    // =========================================================================
 
     @Test
     void extractClaim_retornaSubjectCorreto() {

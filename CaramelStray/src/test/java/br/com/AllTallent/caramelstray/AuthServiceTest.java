@@ -66,9 +66,6 @@ class AuthServiceTest {
         return p;
     }
 
-    // =========================================================================
-    // Validação de email duplicado
-    // =========================================================================
 
     @Test
     void register_lancaExcecao_quandoEmailJaExiste() {
@@ -83,10 +80,6 @@ class AuthServiceTest {
         assertTrue(ex.getMessage().contains("Email"));
         verify(funcionarioRepository, never()).save(any());
     }
-
-    // =========================================================================
-    // Relacionamentos obrigatórios
-    // =========================================================================
 
     @Test
     void register_lancaExcecao_quandoAreaNaoEncontrada() {
@@ -117,10 +110,7 @@ class AuthServiceTest {
         verify(funcionarioRepository, never()).save(any());
     }
 
-    // =========================================================================
-    // Cadastro bem-sucedido sem gestor
-    // =========================================================================
-
+ 
     @Test
     void register_salvaFuncionario_semGestor() {
         CadastroRequestDTO d = dto("novo@test.com", 1, 3);
@@ -196,9 +186,6 @@ class AuthServiceTest {
         assertEquals(p, captor.getValue().getPerfil());
     }
 
-    // =========================================================================
-    // Cadastro com gestor
-    // =========================================================================
 
     @Test
     void register_salvaFuncionario_comGestor() {

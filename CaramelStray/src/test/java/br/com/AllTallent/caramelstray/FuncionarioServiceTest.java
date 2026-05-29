@@ -79,9 +79,6 @@ class FuncionarioServiceTest {
         SecurityContextHolder.clearContext();
     }
 
-    // =========================================================================
-    // listarTodos
-    // =========================================================================
 
     @Test
     void listarTodos_semFiltro_retornaTodosOsFuncionarios() {
@@ -117,9 +114,6 @@ class FuncionarioServiceTest {
         verify(funcionarioRepository).findAll();
     }
 
-    // =========================================================================
-    // buscarPorId
-    // =========================================================================
 
     @Test
     void buscarPorId_retornaDTO_quandoEncontrado() {
@@ -139,9 +133,6 @@ class FuncionarioServiceTest {
                 () -> funcionarioService.buscarPorId(999));
     }
 
-    // =========================================================================
-    // criar
-    // =========================================================================
 
     @Test
     void criar_persisteESalvaFuncionario() {
@@ -205,9 +196,6 @@ class FuncionarioServiceTest {
                 () -> funcionarioService.criar(dto));
     }
 
-    // =========================================================================
-    // atualizar
-    // =========================================================================
 
     @Test
     void atualizar_atualizaDados_quandoFuncionarioExiste() {
@@ -237,9 +225,6 @@ class FuncionarioServiceTest {
                 () -> funcionarioService.atualizar(999, dto));
     }
 
-    // =========================================================================
-    // deletar
-    // =========================================================================
 
     @Test
     void deletar_removeFuncionario_quandoExiste() {
@@ -258,9 +243,6 @@ class FuncionarioServiceTest {
                 () -> funcionarioService.deletar(99));
     }
 
-    // =========================================================================
-    // associarCompetencias
-    // =========================================================================
 
     @Test
     void associarCompetencias_permitido_quandoProprioFuncionario() {
@@ -338,9 +320,6 @@ class FuncionarioServiceTest {
                 () -> funcionarioService.associarCompetencias(5, List.of(999)));
     }
 
-    // =========================================================================
-    // usuarioPodeRemoverCertificado / usuarioPodeEditarExperiencia
-    // =========================================================================
 
     @Test
     void usuarioPodeRemoverCertificado_retornaTrue_quandoDono() {
@@ -390,9 +369,6 @@ class FuncionarioServiceTest {
         assertFalse(funcionarioService.usuarioPodeEditarExperiencia(5, 42));
     }
 
-    // =========================================================================
-    // removerCertificado
-    // =========================================================================
 
     @Test
     void removerCertificado_deletaQuandoExiste() {
@@ -411,9 +387,6 @@ class FuncionarioServiceTest {
                 () -> funcionarioService.removerCertificado(99));
     }
 
-    // =========================================================================
-    // adicionarExperiencia
-    // =========================================================================
 
     @Test
     void adicionarExperiencia_salvaERetornaDTO() {

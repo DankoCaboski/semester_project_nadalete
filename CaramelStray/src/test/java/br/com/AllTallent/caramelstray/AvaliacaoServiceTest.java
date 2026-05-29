@@ -72,10 +72,7 @@ class AvaliacaoServiceTest {
         SecurityContextHolder.clearContext();
     }
 
-    // =========================================================================
-    // listarTodasAvaliacoes
-    // =========================================================================
-
+ 
     @Test
     void listarTodasAvaliacoes_adminVeAvaliacoesDaMesmaArea() {
         // Admin (perfil 1) na área 10
@@ -161,9 +158,6 @@ class AvaliacaoServiceTest {
         assertTrue(resultado.isEmpty());
     }
 
-    // =========================================================================
-    // buscarPendentesPorFuncionario
-    // =========================================================================
 
     @Test
     void buscarPendentesPorFuncionario_retornaApenasComStatusPendente() {
@@ -202,9 +196,6 @@ class AvaliacaoServiceTest {
         assertTrue(resultado.isEmpty());
     }
 
-    // =========================================================================
-    // finalizarPeloColaborador
-    // =========================================================================
 
     @Test
     void finalizarPeloColaborador_alteraStatusParaAguardandoRevisao_quandoPendente() {
@@ -276,9 +267,6 @@ class AvaliacaoServiceTest {
                 () -> avaliacaoService.finalizarPeloColaborador(999L));
     }
 
-    // =========================================================================
-    // salvarOuAtualizarResposta
-    // =========================================================================
 
     @Test
     void salvarOuAtualizarResposta_salvaNovamente_quandoNaoExisteResposta() {
@@ -338,9 +326,6 @@ class AvaliacaoServiceTest {
                 () -> avaliacaoService.salvarOuAtualizarResposta(dto));
     }
 
-    // =========================================================================
-    // buscarDadosRevisao
-    // =========================================================================
 
     @Test
     void buscarDadosRevisao_lancaEntityNotFound_quandoInstanciaNaoExiste() {
@@ -361,9 +346,6 @@ class AvaliacaoServiceTest {
         assertTrue(resultado.isEmpty());
     }
 
-    // =========================================================================
-    // getUsuarioLogado — acesso sem autenticação
-    // =========================================================================
 
     @Test
     void listarTodasAvaliacoes_lancaUnauthorized_quandoSemAutenticacao() {

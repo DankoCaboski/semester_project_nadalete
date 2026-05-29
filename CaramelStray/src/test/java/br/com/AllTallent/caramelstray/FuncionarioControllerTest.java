@@ -80,9 +80,6 @@ class FuncionarioControllerTest {
                 null, null, null, null, null, null);
     }
 
-    // =========================================================================
-    // GET /api/funcionario — isAuthenticated()
-    // =========================================================================
 
     @Test
     void listarTodos_retorna401_quandoNaoAutenticado() throws Exception {
@@ -115,9 +112,6 @@ class FuncionarioControllerTest {
         verify(funcionarioService).listarTodos("João");
     }
 
-    // =========================================================================
-    // GET /api/funcionario/{id} — hasAnyRole(ADMIN, GESTOR) or principal.codigo == id
-    // =========================================================================
 
     @Test
     void buscarPorId_retorna401_quandoNaoAutenticado() throws Exception {
@@ -163,9 +157,6 @@ class FuncionarioControllerTest {
         verify(funcionarioService, never()).buscarPorId(any());
     }
 
-    // =========================================================================
-    // POST /api/funcionario — hasRole('ADMIN')
-    // =========================================================================
 
     @Test
     void criar_retorna401_quandoNaoAutenticado() throws Exception {
@@ -202,10 +193,6 @@ class FuncionarioControllerTest {
         verify(funcionarioService, never()).criar(any());
     }
 
-    // =========================================================================
-    // PUT /api/funcionario/{id} — principal.codigo == id
-    // =========================================================================
-
     @Test
     @WithCustomUser(codigo = 5, perfilCodigo = 3)
     void atualizar_retorna200_quandoProprioFuncionario() throws Exception {
@@ -232,9 +219,6 @@ class FuncionarioControllerTest {
         verify(funcionarioService, never()).atualizar(any(), any());
     }
 
-    // =========================================================================
-    // DELETE /api/funcionario/{id} — hasRole('ADMIN')
-    // =========================================================================
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -256,9 +240,6 @@ class FuncionarioControllerTest {
         verify(funcionarioService, never()).deletar(any());
     }
 
-    // =========================================================================
-    // GET /api/funcionario/{id}/perfil — hasAnyRole(ADMIN, GESTOR) or principal.codigo == id
-    // =========================================================================
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -293,9 +274,6 @@ class FuncionarioControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    // =========================================================================
-    // POST /api/funcionario/{id}/certificados — hasRole('ADMIN') or principal.codigo == id
-    // =========================================================================
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -335,11 +313,7 @@ class FuncionarioControllerTest {
         verify(funcionarioService, never()).adicionarCertificado(any(), any());
     }
 
-    // =========================================================================
-    // DELETE /api/funcionario/certificados/{id}
-    //   — hasRole('ADMIN') or @funcionarioService.usuarioPodeRemoverCertificado(...)
-    // =========================================================================
-
+ 
     @Test
     @WithMockUser(roles = "ADMIN")
     void removerCertificado_retorna204_quandoAdmin() throws Exception {
@@ -374,9 +348,6 @@ class FuncionarioControllerTest {
         verify(funcionarioService, never()).removerCertificado(any());
     }
 
-    // =========================================================================
-    // PUT /api/funcionario/{id}/competencias — isAuthenticated()
-    // =========================================================================
 
     @Test
     void atualizarCompetencias_retorna401_quandoNaoAutenticado() throws Exception {
@@ -401,9 +372,6 @@ class FuncionarioControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    // =========================================================================
-    // GET /api/funcionario/{id}/experiencias — hasAnyRole(ADMIN, GESTOR) or principal.codigo == id
-    // =========================================================================
 
     @Test
     @WithMockUser(roles = "GESTOR")
@@ -424,9 +392,6 @@ class FuncionarioControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    // =========================================================================
-    // POST /api/funcionario/{id}/experiencias — hasRole('ADMIN') or principal.codigo == id
-    // =========================================================================
 
     @Test
     @WithCustomUser(codigo = 5, perfilCodigo = 3)
@@ -458,10 +423,6 @@ class FuncionarioControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    // =========================================================================
-    // PUT /api/funcionario/experiencias/{id}
-    //   — hasRole('ADMIN') or @funcionarioService.usuarioPodeEditarExperiencia(...)
-    // =========================================================================
 
     @Test
     @WithMockUser(roles = "ADMIN")
