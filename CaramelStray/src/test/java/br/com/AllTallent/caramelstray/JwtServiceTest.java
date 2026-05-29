@@ -1,6 +1,7 @@
 package br.com.AllTallent.caramelstray;
 
 import br.com.AllTallent.config.JwtService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
@@ -98,8 +99,7 @@ class JwtServiceTest {
         String token = jwtService.generateToken(ud);
 
         // Claims::getSubject é o mesmo que extractUsername; testa a API genérica
-        String subject = jwtService.extractClaim(token,
-                claims -> claims.getSubject());
+        String subject = jwtService.extractClaim(token, Claims::getSubject);
 
         assertEquals("sub@test.com", subject);
     }
@@ -109,8 +109,7 @@ class JwtServiceTest {
         UserDetails ud = userDetails("exp@test.com");
         String token = jwtService.generateToken(ud);
 
-        var expiration = jwtService.extractClaim(token,
-                claims -> claims.getExpiration());
+        var expiration = jwtService.extractClaim(token, Claims::getExpiration);
 
         assertNotNull(expiration);
         // Token recém gerado deve expirar no futuro
