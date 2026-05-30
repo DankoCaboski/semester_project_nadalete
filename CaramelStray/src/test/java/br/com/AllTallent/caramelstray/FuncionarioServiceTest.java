@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -414,5 +415,361 @@ class FuncionarioServiceTest {
 
         assertThrows(ResourceNotFoundException.class,
                 () -> funcionarioService.adicionarExperiencia(99, dto));
+    }
+
+    @Test
+    void adicionarExperiencia_retornaDTOComCamposCorretos() {
+        Funcionario f = funcionarioSimples(1);
+        ExperienciaRequestDTO dto = new ExperienciaRequestDTO(
+                "Analista", "Tech Corp", LocalDate.of(2021, 6, 1), LocalDate.of(2023, 12, 31), "Análise de sistemas");
+
+        when(funcionarioRepository.findById(1)).thenReturn(Optional.of(f));
+        when(funcionarioRepository.save(any())).thenReturn(f);
+
+        ExperienciaDTO resultado = funcionarioService.adicionarExperiencia(1, dto);
+
+        assertEquals("Analista", resultado.cargo());
+        assertEquals("Tech Corp", resultado.empresa());
+        assertEquals(LocalDate.of(2021, 6, 1), resultado.dataInicio());
+        assertEquals(LocalDate.of(2023, 12, 31), resultado.dataFim());
+        assertEquals("Análise de sistemas", resultado.descricao());
+    }
+
+
+    
+    @Test
+    void criar_associaPerfil_quandoPerfilIdFornecido() {
+        Perfil perfil = new Perfil();
+        perfil.setCodigo(2);
+
+        FuncionarioRequestDTO dto = new FuncionarioRequestDTO(
+                "Nome", "email@test.com", null, null, null,
+                null, 2, null, null, null, null);
+
+        when(perfilRepository.findById(2)).thenReturn(Optional.of(perfil));
+        when(funcionarioRepository.save(any())).thenReturn(funcionarioSimples(1));
+
+        assertDoesNotThrow(() -> funcionarioService.criar(dto));
+
+        verify(perfilRepository).findById(2);
+    }
+
+    @Test
+    void criar_lancaResourceNotFound_quandoPerfilNaoExiste() {
+        FuncionarioRequestDTO dto = new FuncionarioRequestDTO(
+                "Nome", "email@test.com", null, null, null,
+                null, 999, null, null, null, null);
+
+        when(perfilRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.criar(dto));
+    }
+
+    @Test
+    void criar_associaGestor_quandoGestorIdFornecido() {
+        Funcionario gestor = funcionarioSimples(5);
+
+        FuncionarioRequestDTO dto = new FuncionarioRequestDTO(
+                "Nome", "email@test.com", null, null, null,
+                null, null, 5, null, null, null);
+
+        when(funcionarioRepository.findById(5)).thenReturn(Optional.of(gestor));
+        when(funcionarioRepository.save(any())).thenReturn(funcionarioSimples(1));
+
+        assertDoesNotThrow(() -> funcionarioService.criar(dto));
+
+        verify(funcionarioRepository).findById(5);
+    }
+
+    @Test
+    void criar_lancaResourceNotFound_quandoGestorNaoExiste() {
+        FuncionarioRequestDTO dto = new FuncionarioRequestDTO(
+                "Nome", "email@test.com", null, null, null,
+                null, null, 999, null, null, null);
+
+        when(funcionarioRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.criar(dto));
+    }
+
+    @Test
+    void criar_naoCodeSenha_quandoSenhaHashVazia() {
+        FuncionarioRequestDTO dto = new FuncionarioRequestDTO(
+                "Nome", "email@test.com", null, null, "",
+                null, null, null, null, null, null);
+
+        when(funcionarioRepository.save(any())).thenReturn(funcionarioSimples(1));
+
+        funcionarioService.criar(dto);
+
+        verify(passwordEncoder, never()).encode(any());
+    }
+
+
+    @Test
+    void atualizar_lancaResourceNotFound_quandoAreaNaoExisteDuranteAtualizacao() {
+        Funcionario existente = funcionarioSimples(1);
+        FuncionarioRequestDTO dto = new FuncionarioRequestDTO(
+                null, null, null, null, null,
+                999, null, null, null, null, null);
+
+        when(funcionarioRepository.findById(1)).thenReturn(Optional.of(existente));
+        when(areaRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.atualizar(1, dto));
+    }
+
+    @Test
+    void atualizar_lancaResourceNotFound_quandoPerfilNaoExisteDuranteAtualizacao() {
+        Funcionario existente = funcionarioSimples(1);
+        FuncionarioRequestDTO dto = new FuncionarioRequestDTO(
+                null, null, null, null, null,
+                null, 999, null, null, null, null);
+
+        when(funcionarioRepository.findById(1)).thenReturn(Optional.of(existente));
+        when(perfilRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.atualizar(1, dto));
+    }
+
+    @Test
+    void atualizar_lancaResourceNotFound_quandoGestorNaoExisteDuranteAtualizacao() {
+        Funcionario existente = funcionarioSimples(1);
+        FuncionarioRequestDTO dto = new FuncionarioRequestDTO(
+                null, null, null, null, null,
+                null, null, 999, null, null, null);
+
+        when(funcionarioRepository.findById(1)).thenReturn(Optional.of(existente));
+        when(funcionarioRepository.findById(999)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.atualizar(1, dto));
+    }
+
+
+    @Test
+    void buscarPerfilPorId_retornaDTO_quandoEncontrado() {
+        Funcionario f = funcionarioSimples(1);
+        when(funcionarioRepository.findByIdCompleto(1)).thenReturn(Optional.of(f));
+
+        FuncionarioPerfilDTO dto = funcionarioService.buscarPerfilPorId(1);
+
+        assertNotNull(dto);
+        assertEquals(1, dto.codigo());
+    }
+
+    @Test
+    void buscarPerfilPorId_lancaResourceNotFound_quandoNaoExiste() {
+        when(funcionarioRepository.findByIdCompleto(99)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.buscarPerfilPorId(99));
+    }
+
+
+    @Test
+    void adicionarCertificado_salvaERetornaDTO_quandoCertificadosNulos() {
+        Funcionario f = funcionarioSimples(1);
+        f.setCertificados(null);
+
+        when(funcionarioRepository.findById(1)).thenReturn(Optional.of(f));
+        when(funcionarioRepository.save(any())).thenReturn(f);
+
+        CertificadoDTO resultado = funcionarioService.adicionarCertificado(1, new CertificadoRequestDTO("AWS"));
+
+        assertEquals("AWS", resultado.nome());
+        verify(funcionarioRepository).save(f);
+    }
+
+    @Test
+    void adicionarCertificado_salvaERetornaDTO_quandoCertificadosJaExistem() {
+        Funcionario f = funcionarioSimples(1);
+        FuncionarioCertificado existente = new FuncionarioCertificado();
+        existente.setCodigo(1);
+        existente.setCertificado("Java");
+        f.setCertificados(new java.util.HashSet<>(Set.of(existente)));
+
+        when(funcionarioRepository.findById(1)).thenReturn(Optional.of(f));
+        when(funcionarioRepository.save(any())).thenReturn(f);
+
+        CertificadoDTO resultado = funcionarioService.adicionarCertificado(1, new CertificadoRequestDTO("Python"));
+
+        assertEquals("Python", resultado.nome());
+        assertEquals(2, f.getCertificados().size());
+    }
+
+    @Test
+    void adicionarCertificado_lancaEntityNotFound_quandoFuncionarioNaoExiste() {
+        when(funcionarioRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThrows(jakarta.persistence.EntityNotFoundException.class,
+                () -> funcionarioService.adicionarCertificado(99, new CertificadoRequestDTO("AWS")));
+    }
+
+
+    @Test
+    void associarCompetencias_permitido_quandoAdminEditaColaboradorDaMesmaArea() {
+        Funcionario admin = funcionarioComPerfilEArea(1, 1, 10);
+        setarUsuarioLogado(new CustomUserDetails(admin));
+
+        Funcionario alvo = funcionarioComPerfilEArea(5, 3, 10);
+        Competencia c = new Competencia();
+        c.setCodigo(1);
+
+        when(funcionarioRepository.findByIdCompleto(5)).thenReturn(Optional.of(alvo));
+        when(competenciaRepository.findAllById(List.of(1))).thenReturn(List.of(c));
+        when(funcionarioRepository.save(any())).thenReturn(alvo);
+
+        assertDoesNotThrow(() -> funcionarioService.associarCompetencias(5, List.of(1)));
+        verify(funcionarioRepository).save(alvo);
+    }
+
+    @Test
+    void associarCompetencias_negado_quandoAlvoSemPerfil() {
+        Funcionario gestor = funcionarioComPerfilEArea(2, 2, 10);
+        setarUsuarioLogado(new CustomUserDetails(gestor));
+
+        Funcionario alvoSemPerfil = funcionarioSimples(5);
+        alvoSemPerfil.setPerfil(null);
+
+        Area area = new Area();
+        area.setCodigo(10);
+        alvoSemPerfil.setArea(area);
+
+        when(funcionarioRepository.findByIdCompleto(5)).thenReturn(Optional.of(alvoSemPerfil));
+
+        List<Integer> ids = List.of(1);
+        assertThrows(UnauthorizedActionException.class,
+                () -> funcionarioService.associarCompetencias(5, ids));
+    }
+
+    @Test
+    void associarCompetencias_negado_quandoAlvoSemArea() {
+        Funcionario gestor = funcionarioComPerfilEArea(2, 2, 10);
+        setarUsuarioLogado(new CustomUserDetails(gestor));
+
+        Perfil perfil = new Perfil();
+        perfil.setCodigo(3);
+        Funcionario alvoSemArea = funcionarioSimples(5);
+        alvoSemArea.setPerfil(perfil);
+        alvoSemArea.setArea(null);
+
+        when(funcionarioRepository.findByIdCompleto(5)).thenReturn(Optional.of(alvoSemArea));
+
+        List<Integer> ids = List.of(1);
+        assertThrows(UnauthorizedActionException.class,
+                () -> funcionarioService.associarCompetencias(5, ids));
+    }
+
+    @Test
+    void associarCompetencias_negado_quandoGestorTentaEditarOutroGestor() {
+        Funcionario gestor = funcionarioComPerfilEArea(2, 2, 10);
+        setarUsuarioLogado(new CustomUserDetails(gestor));
+
+        Funcionario alvoGestor = funcionarioComPerfilEArea(3, 2, 10);
+
+        when(funcionarioRepository.findByIdCompleto(3)).thenReturn(Optional.of(alvoGestor));
+
+        List<Integer> ids = List.of(1);
+        assertThrows(UnauthorizedActionException.class,
+                () -> funcionarioService.associarCompetencias(3, ids));
+    }
+
+
+    @Test
+    void buscarFuncionarioCompleto_retornaFuncionario_quandoEncontrado() {
+        Funcionario f = funcionarioSimples(1);
+        when(funcionarioRepository.findByIdCompleto(1)).thenReturn(Optional.of(f));
+
+        Funcionario resultado = funcionarioService.buscarFuncionarioCompleto(1);
+
+        assertNotNull(resultado);
+        assertEquals(1, resultado.getCodigo());
+    }
+
+    @Test
+    void buscarFuncionarioCompleto_lancaResourceNotFound_quandoNaoExiste() {
+        when(funcionarioRepository.findByIdCompleto(99)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.buscarFuncionarioCompleto(99));
+    }
+
+
+    @Test
+    void listarExperienciasPorFuncionario_retornaDTO_quandoEncontrado() {
+        Funcionario f = funcionarioSimples(1);
+        f.setExperiencias(Set.of());
+        when(funcionarioRepository.findByIdCompleto(1)).thenReturn(Optional.of(f));
+
+        FuncionarioExperienciasResponseDTO dto = funcionarioService.listarExperienciasPorFuncionario(1);
+
+        assertNotNull(dto);
+        assertEquals(1, dto.codigoFuncionario());
+        assertTrue(dto.experiencias().isEmpty());
+    }
+
+    @Test
+    void listarExperienciasPorFuncionario_lancaResourceNotFound_quandoNaoExiste() {
+        when(funcionarioRepository.findByIdCompleto(99)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.listarExperienciasPorFuncionario(99));
+    }
+
+
+    @Test
+    void atualizarExperiencia_atualizaCamposERetornaDTO() {
+        Experiencia exp = new Experiencia();
+        exp.setCodigo(1);
+        exp.setCargo("Dev");
+        exp.setEmpresa("Empresa Antiga");
+
+        ExperienciaRequestDTO dto = new ExperienciaRequestDTO(
+                "Sênior", "Nova Corp", LocalDate.of(2020, 1, 1), LocalDate.of(2024, 6, 30), "Nova desc");
+
+        when(experienciaRepository.findById(1)).thenReturn(Optional.of(exp));
+        when(experienciaRepository.save(exp)).thenReturn(exp);
+
+        ExperienciaDTO resultado = funcionarioService.atualizarExperiencia(1, dto);
+
+        assertEquals("Sênior", resultado.cargo());
+        assertEquals("Nova Corp", resultado.empresa());
+        assertEquals(LocalDate.of(2020, 1, 1), resultado.dataInicio());
+        assertEquals(LocalDate.of(2024, 6, 30), resultado.dataFim());
+        assertEquals("Nova desc", resultado.descricao());
+        verify(experienciaRepository).save(exp);
+    }
+
+    @Test
+    void atualizarExperiencia_lancaResourceNotFound_quandoNaoExiste() {
+        ExperienciaRequestDTO dto = new ExperienciaRequestDTO(
+                "Dev", "Empresa", LocalDate.of(2022, 1, 1), null, null);
+
+        when(experienciaRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.atualizarExperiencia(99, dto));
+    }
+
+
+    @Test
+    void usuarioPodeEditarExperiencia_lancaResourceNotFound_quandoNaoExiste() {
+        when(experienciaRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.usuarioPodeEditarExperiencia(99, 1));
+    }
+
+    @Test
+    void usuarioPodeRemoverCertificado_lancaResourceNotFound_quandoNaoExiste() {
+        when(certificadoRepository.findById(99)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> funcionarioService.usuarioPodeRemoverCertificado(99, 1));
     }
 }
