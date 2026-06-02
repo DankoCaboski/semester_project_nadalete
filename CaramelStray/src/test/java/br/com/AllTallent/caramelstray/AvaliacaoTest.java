@@ -5,6 +5,8 @@ import br.com.AllTallent.model.AvaliacaoFuncionario;
 import br.com.AllTallent.model.Funcionario;
 import br.com.AllTallent.model.Pergunta;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
@@ -14,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AvaliacaoTest {
 
-    private Pergunta pergunta(long codigo) {
+    private Pergunta novaPergunta(long codigo) {
         Pergunta p = new Pergunta();
         p.setCodigo(codigo);
         return p;
@@ -37,41 +39,26 @@ class AvaliacaoTest {
         assertEquals("Rascunho", a.getStatus());
     }
 
-    @Test
-    void onCreate_defineStatusRascunho_quandoStatusVazio() {
+    @ParameterizedTest
+    @CsvSource({
+        "'',     Rascunho",
+        "'   ',  Rascunho",
+        "Ativo,  Ativo"
+    })
+    void onCreate_defineStatusCorreto(String statusInicial, String statusEsperado) {
         Avaliacao a = new Avaliacao();
-        a.setStatus("");
+        a.setStatus(statusInicial);
 
         ReflectionTestUtils.invokeMethod(a, "onCreate");
 
-        assertEquals("Rascunho", a.getStatus());
-    }
-
-    @Test
-    void onCreate_defineStatusRascunho_quandoStatusSomenteEspacos() {
-        Avaliacao a = new Avaliacao();
-        a.setStatus("   ");
-
-        ReflectionTestUtils.invokeMethod(a, "onCreate");
-
-        assertEquals("Rascunho", a.getStatus());
-    }
-
-    @Test
-    void onCreate_preservaStatusExistente_quandoJaDefinido() {
-        Avaliacao a = new Avaliacao();
-        a.setStatus("Ativo");
-
-        ReflectionTestUtils.invokeMethod(a, "onCreate");
-
-        assertEquals("Ativo", a.getStatus());
+        assertEquals(statusEsperado.trim(), a.getStatus());
     }
 
     @Test
     void addPergunta_adicionaPergunta_quandoSetNulo() {
         Avaliacao a = new Avaliacao();
         a.setPerguntas(null);
-        Pergunta p = pergunta(1L);
+        Pergunta p = novaPergunta(1L);
 
         a.addPergunta(p);
 
@@ -84,9 +71,9 @@ class AvaliacaoTest {
     void addPergunta_adicionaPergunta_quandoSetJaExiste() {
         Avaliacao a = new Avaliacao();
         a.setPerguntas(new HashSet<>());
-        a.addPergunta(pergunta(1L));
+        a.addPergunta(novaPergunta(1L));
 
-        a.addPergunta(pergunta(2L));
+        a.addPergunta(novaPergunta(2L));
 
         assertEquals(2, a.getPerguntas().size());
     }
@@ -94,7 +81,7 @@ class AvaliacaoTest {
     @Test
     void removePergunta_removePergunta_quandoPresente() {
         Avaliacao a = new Avaliacao();
-        Pergunta p = pergunta(1L);
+        Pergunta p = novaPergunta(1L);
         a.setPerguntas(new HashSet<>());
         a.getPerguntas().add(p);
 
@@ -108,7 +95,7 @@ class AvaliacaoTest {
         Avaliacao a = new Avaliacao();
         a.setPerguntas(null);
 
-        assertDoesNotThrow(() -> a.removePergunta(pergunta(1L)));
+        assertDoesNotThrow(() -> a.removePergunta(novaPergunta(1L)));
     }
 
     @Test
