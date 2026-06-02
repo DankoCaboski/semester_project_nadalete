@@ -5,7 +5,7 @@
                  version="3.0">
 
     <sql-result-set-mapping name="EvolucaoMensalMapping">
-        <constructor-result target-class="br.com.AllTallent.dto.MesQuantidadeDTO">
+        <constructor-result target-class="br.com.alltallent.dto.MesQuantidadeDTO">
             <column name="mes" class="java.lang.String"/>
             <column name="quantidade" class="java.lang.Number"/>
         </constructor-result>
