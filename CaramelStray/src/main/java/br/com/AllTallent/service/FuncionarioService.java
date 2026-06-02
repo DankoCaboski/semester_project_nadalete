@@ -59,13 +59,6 @@ public class FuncionarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /*
-    @Transactional(readOnly = true)
-    public List<FuncionarioResponseDTO> listarTodos() {
-        return funcionarioRepository.findAll().stream()
-                .map(FuncionarioResponseDTO::new)
-                .collect(Collectors.toList());
-    }*/
 
     @Transactional(readOnly = true)
     public List<FuncionarioResponseDTO> listarTodos(String texto) {

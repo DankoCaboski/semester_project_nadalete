@@ -84,7 +84,7 @@ public class DashboardService {
         // --- Conversão de Projeção para DTO ---
         List<MesQuantidadeDTO> evolucao = evolucaoProj.stream()
             .map(p -> new MesQuantidadeDTO(p.getMes(), p.getQuantidade()))
-            .collect(Collectors.toList());
+            .toList();
 
         // --- Cálculo da Meta ---
         Double metaMensal = 0.0;

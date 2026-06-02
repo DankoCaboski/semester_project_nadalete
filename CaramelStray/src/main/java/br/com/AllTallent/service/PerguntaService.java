@@ -39,7 +39,7 @@ public class PerguntaService {
                 .orElseThrow(() -> new EntityNotFoundException("Competência não encontrada: " + dto.competenciaCodigo()));
 
         Pergunta novaPergunta = new Pergunta();
-        novaPergunta.setPergunta(dto.pergunta());
+        novaPergunta.setEnunciado(dto.pergunta());
         novaPergunta.setCompetencia(competencia);
         novaPergunta.setTipoPergunta(dto.tipoPergunta()); 
 
