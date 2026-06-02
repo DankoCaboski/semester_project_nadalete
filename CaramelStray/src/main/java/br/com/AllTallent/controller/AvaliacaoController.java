@@ -10,16 +10,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder; 
 
-import org.springframework.security.access.prepost.PreAuthorize; 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/avaliacoes") 
+@RequestMapping("/api/avaliacoes")
 public class AvaliacaoController {
 
-    private final AvaliacaoService avaliacaoService; 
+    private static final Logger log = LoggerFactory.getLogger(AvaliacaoController.class);
+
+    private final AvaliacaoService avaliacaoService;
 
     public AvaliacaoController(AvaliacaoService avaliacaoService) {
         this.avaliacaoService = avaliacaoService;
@@ -43,7 +47,7 @@ public class AvaliacaoController {
         } catch (EntityNotFoundException e) {
              return ResponseEntity.badRequest().body(null); 
         } catch (Exception e) {
-            System.err.println("Erro ao criar avaliação: " + e.getMessage()); 
+            log.error("Erro ao criar avaliação: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -79,7 +83,7 @@ public class AvaliacaoController {
     
     @PostMapping("/respostas")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> salvarResposta( 
+    public ResponseEntity<Object> salvarResposta(
             @Valid @RequestBody RespostaColaboradorRequestDTO respostaDTO) {
         try {
             RespostaColaboradorResponseDTO respostaSalva = avaliacaoService.salvarOuAtualizarResposta(respostaDTO);
@@ -89,49 +93,47 @@ public class AvaliacaoController {
         } catch (IllegalArgumentException e) {
              return ResponseEntity.badRequest().body("Erro ao salvar resposta: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Erro interno ao salvar resposta: " + e.getMessage());
+            log.error("Erro interno ao salvar resposta: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao salvar resposta.");
         }
     }
 
     @GetMapping("/instancias/{instanciaId}/respostas")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
-    public ResponseEntity<?> buscarRespostasPorInstancia(@PathVariable Long instanciaId) {
+    public ResponseEntity<List<RespostaColaboradorResponseDTO>> buscarRespostasPorInstancia(@PathVariable Long instanciaId) {
         try {
             List<RespostaColaboradorResponseDTO> respostas = avaliacaoService.buscarRespostasPorInstancia(instanciaId);
             return ResponseEntity.ok(respostas);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build(); 
+            return ResponseEntity.notFound().<List<RespostaColaboradorResponseDTO>>build();
         }
     }
 
     // --- NOVO ENDPOINT PARA SUPERVISOR VISUALIZAR AVALIAÇÃO CONCLUÍDA (Task 4) ---
     @GetMapping("/revisao/{codigoAvaliacaoFuncionario}")
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
-    public ResponseEntity<?> getDadosParaRevisao(@PathVariable Long codigoAvaliacaoFuncionario) {
+    public ResponseEntity<List<RevisaoDetalhadaDTO>> getDadosParaRevisao(@PathVariable Long codigoAvaliacaoFuncionario) {
         try {
-            // Você precisará criar este método 'buscarDadosRevisao' no seu AvaliacaoService
-            // Ele deve retornar um DTO com Pergunta + Resposta (semelhante ao 'responder', mas read-only)
             List<RevisaoDetalhadaDTO> revisao = avaliacaoService.buscarDadosRevisao(codigoAvaliacaoFuncionario);
             return ResponseEntity.ok(revisao);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().<List<RevisaoDetalhadaDTO>>build();
         }
     }
     // -----------------------------------------------------------------------------
 
     @PutMapping("/instancias/{instanciaId}/revisar") 
     @PreAuthorize("hasAnyRole('ADMIN', 'GESTOR')")
-    public ResponseEntity<?> salvarRevisaoSupervisor(
+    public ResponseEntity<Object> salvarRevisaoSupervisor(
             @PathVariable Long instanciaId,
             @Valid @RequestBody RevisaoSupervisorRequestDTO revisaoDTO) {
         try {
             AvaliacaoFuncionarioResponseDTO instanciaAtualizada = avaliacaoService.salvarRevisaoSupervisor(instanciaId, revisaoDTO);
-            return ResponseEntity.ok(instanciaAtualizada); 
+            return ResponseEntity.ok(instanciaAtualizada);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().<Object>build();
         } catch (Exception e) {
-             System.err.println("Erro interno ao salvar revisão: " + e.getMessage());
+            log.error("Erro interno ao salvar revisão: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno ao salvar revisão.");
         }
     }
@@ -145,12 +147,12 @@ public class AvaliacaoController {
 
     @GetMapping("/instancias/{instanciaId}/responder")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> buscarAvaliacaoParaResponder(@PathVariable Long instanciaId) {
+    public ResponseEntity<AvaliacaoParaResponderDTO> buscarAvaliacaoParaResponder(@PathVariable Long instanciaId) {
         try {
             AvaliacaoParaResponderDTO dto = avaliacaoService.buscarParaResponder(instanciaId);
             return ResponseEntity.ok(dto);
         } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().<AvaliacaoParaResponderDTO>build();
         }
     }
     

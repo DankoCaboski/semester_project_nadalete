@@ -10,10 +10,14 @@ import java.util.List;
 
 public class CustomUserDetails implements UserDetails {
 
-    private final String username; 
+    private static final String ROLE_USER  = "ROLE_USER";
+    private static final String ROLE_GESTOR = "ROLE_GESTOR";
+    private static final String ROLE_ADMIN  = "ROLE_ADMIN";
+
+    private final String username;
     private final String password;
-    private final Integer codigo;  
-    private final Integer areaId;  
+    private final Integer codigo;
+    private final Integer areaId;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public CustomUserDetails(Funcionario funcionario) {
@@ -21,24 +25,24 @@ public class CustomUserDetails implements UserDetails {
         this.password = funcionario.getSenhaHash();
         this.codigo = funcionario.getCodigo();
         this.areaId = (funcionario.getArea() != null) ? funcionario.getArea().getCodigo() : null;
-        
+
         if (funcionario.getPerfil() == null) {
-            this.authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+            this.authorities = List.of(new SimpleGrantedAuthority(ROLE_USER));
         } else {
             int perfilId = funcionario.getPerfil().getCodigo();
             if (perfilId == 1) { // Diretoria
                 this.authorities = List.of(
-                    new SimpleGrantedAuthority("ROLE_ADMIN"),
-                    new SimpleGrantedAuthority("ROLE_GESTOR"),
-                    new SimpleGrantedAuthority("ROLE_USER")
+                    new SimpleGrantedAuthority(ROLE_ADMIN),
+                    new SimpleGrantedAuthority(ROLE_GESTOR),
+                    new SimpleGrantedAuthority(ROLE_USER)
                 );
             } else if (perfilId == 2) { // Supervisão
                 this.authorities = List.of(
-                    new SimpleGrantedAuthority("ROLE_GESTOR"),
-                    new SimpleGrantedAuthority("ROLE_USER")
+                    new SimpleGrantedAuthority(ROLE_GESTOR),
+                    new SimpleGrantedAuthority(ROLE_USER)
                 );
             } else { // Perfil 3 (Colaborador)
-                this.authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+                this.authorities = List.of(new SimpleGrantedAuthority(ROLE_USER));
             }
         }
     }

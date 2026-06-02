@@ -6,6 +6,8 @@ import br.com.AllTallent.model.Funcionario;
 import br.com.AllTallent.repository.FuncionarioRepository;
 import br.com.AllTallent.service.DashboardService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DashboardController {
 
+    private static final Logger log = LoggerFactory.getLogger(DashboardController.class);
+
     private final DashboardService dashboardService;
     private final FuncionarioRepository funcionarioRepository;
 
@@ -29,47 +33,41 @@ public class DashboardController {
      */
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getDashboardData(
+    public ResponseEntity<Object> getDashboardData(
             @RequestParam(required = false) Integer codigoArea,
             Authentication authentication) {
 
-        System.out.println(">>> 1. ENDPOINT ACIONADO - INICIANDO...");
+        log.debug("Endpoint getDashboardData acionado");
 
         try {
-            // --- LÓGICA DE PERMISSÃO ---
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             Integer usuarioLogadoId = userDetails.getCodigo();
 
             boolean isAdmin = authentication.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_DIRETORIA"));
-            
+
             boolean isGestor = authentication.getAuthorities().stream()
                     .anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR") || a.getAuthority().equals("ROLE_SUPERVISAO"));
 
             Integer filtroAreaId = codigoArea;
 
-            // Se for Gestor (e não Admin), FORÇA o filtro para a área dele.
             if (isGestor && !isAdmin) {
                 Funcionario gestor = funcionarioRepository.findById(usuarioLogadoId)
                         .orElseThrow(() -> new RuntimeException("Funcionário não encontrado"));
-                
+
                 if (gestor.getArea() != null) {
                     filtroAreaId = gestor.getArea().getCodigo();
-                    System.out.println(">>> 2. FILTRO APLICADO (GESTOR): Área ID " + filtroAreaId);
+                    log.debug("Filtro de área aplicado para gestor: areaId={}", filtroAreaId);
                 }
             }
 
-            // --- CHAMADA AO SERVICE ---
-            System.out.println(">>> TENTANDO CHAMAR O SERVICE...");
             DashboardResponseDTO data = dashboardService.getDashboardData(filtroAreaId);
-            
-            System.out.println(">>> 3. SUCESSO! DADOS RECEBIDOS DO SERVICE: " + data);
+            log.debug("getDashboardData concluído com sucesso");
 
             return ResponseEntity.ok(data);
 
         } catch (Exception e) {
-            // --- CAPTURA DO ERRO ---
-            System.out.println(">>>  ERRO CAPTURADO NO CONTROLLER ");
+            log.error("Erro ao obter dados do dashboard: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().body("Erro interno no servidor: " + e.getMessage());
         }
     }
