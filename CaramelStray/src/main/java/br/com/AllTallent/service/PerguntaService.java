@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,8 @@ import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class PerguntaService {
+
+    private static final Logger log = LoggerFactory.getLogger(PerguntaService.class);
 
     private final PerguntaRepository perguntaRepository;
     private final CompetenciaRepository competenciaRepository;
@@ -44,31 +48,26 @@ public class PerguntaService {
         boolean isMultipla = tipo.contains("múltipla") || tipo.contains("multipla");
 
         if (isMultipla && dto.opcoes() != null && !dto.opcoes().isEmpty()) {
-            System.out.println(">>> Processando " + dto.opcoes().size() + " opções recebidas.");
-            
+            log.debug("Processando {} opções recebidas", dto.opcoes().size());
+
             Set<PerguntaOpcao> opcoesSet = new HashSet<>();
-            
-            for (OpcaoRequest opRequest : dto.opcoes()) { 
+
+            for (OpcaoRequest opRequest : dto.opcoes()) {
                 if (opRequest.descricao() != null && !opRequest.descricao().trim().isEmpty()) {
                     PerguntaOpcao opcao = new PerguntaOpcao();
-                    
                     opcao.setDescricaoOpcao(opRequest.descricao().trim());
                     opcao.setIsCorreta(opRequest.isCorreta());
-                    
-                    // VINCULO IMPORTANTE: JPA precisa saber quem é o pai
-                    opcao.setPergunta(novaPergunta); 
-                    
+                    opcao.setPergunta(novaPergunta);
                     opcoesSet.add(opcao);
                 }
             }
             novaPergunta.setOpcoes(opcoesSet);
         } else {
-             System.out.println(">>> Não é múltipla escolha ou não há opções válidas. Tipo recebido: " + tipo);
+            log.debug("Pergunta não é múltipla escolha ou não há opções válidas. Tipo recebido: {}", tipo);
         }
 
-        System.out.println(">>> Salvando Pergunta no repositório..."); 
         Pergunta perguntaSalva = perguntaRepository.save(novaPergunta);
-        System.out.println(">>> Pergunta salva com código: " + perguntaSalva.getCodigo()); 
+        log.debug("Pergunta salva com código: {}", perguntaSalva.getCodigo());
 
         return new PerguntaResponseDTO(perguntaSalva);
     }
