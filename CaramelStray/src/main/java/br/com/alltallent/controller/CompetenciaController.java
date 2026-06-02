@@ -1,0 +1,79 @@
+package br.com.alltallent.controller;
+
+import java.net.URI;
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import br.com.alltallent.dto.CompetenciaDTO;
+import br.com.alltallent.dto.CompetenciaRequestDTO;
+import br.com.alltallent.model.Competencia;
+import br.com.alltallent.repository.CompetenciaRepository;
+
+@RestController
+@RequestMapping("/api/competencia")
+public class CompetenciaController {
+
+    private final CompetenciaRepository competenciaRepository;
+
+    public CompetenciaController(CompetenciaRepository competenciaRepository) {
+        this.competenciaRepository = competenciaRepository;
+    }
+
+    
+     @GetMapping
+    public ResponseEntity<List<CompetenciaDTO>> listar() {
+        List<CompetenciaDTO> dtos = competenciaRepository.findAll().stream()
+                .map(CompetenciaDTO::new) 
+                .toList();
+        return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Competencia> buscarPorId(@PathVariable Integer id) {
+        return competenciaRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Competencia> criar(@RequestBody CompetenciaRequestDTO nova) {
+        if (competenciaRepository.existsByNomeIgnoreCase(nova.getNome())) {
+            return ResponseEntity.badRequest().build();
+        }
+        Competencia competencia = new Competencia();
+        competencia.setNome(nova.getNome());
+        competencia.setCategoria(nova.getCategoria());
+        Competencia salva = competenciaRepository.save(competencia);
+        return ResponseEntity.created(URI.create("/api/competencia/" + salva.getCodigo())).body(salva);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Competencia> atualizar(@PathVariable Integer id, @RequestBody CompetenciaRequestDTO atualizada) {
+        return competenciaRepository.findById(id)
+                .map(c -> {
+                    c.setNome(atualizada.getNome());
+                    c.setCategoria(atualizada.getCategoria());
+                    Competencia salva = competenciaRepository.save(c);
+                    return ResponseEntity.ok(salva);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Integer id) {
+        if (!competenciaRepository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        competenciaRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+}
