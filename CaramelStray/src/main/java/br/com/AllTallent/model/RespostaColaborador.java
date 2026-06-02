@@ -26,7 +26,6 @@ public class RespostaColaborador {
     @Column(name = "resposta_texto", columnDefinition = "TEXT")
     private String respostaTexto;
 
-    // AQUI ESTÁ O PULO DO GATO: O nome do atributo que vamos usar em todo lugar
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "codigo_pergunta_opcao_selecionada")
     private PerguntaOpcao perguntaOpcaoSelecionada; 
