@@ -2,7 +2,6 @@ package br.com.AllTallent.dto;
 
 import br.com.AllTallent.model.Avaliacao;
 import br.com.AllTallent.model.AvaliacaoFuncionario;
-//import br.com.AllTallent.model.Funcionario;
 import br.com.AllTallent.model.RespostaColaborador; 
 
 import java.util.Collections;

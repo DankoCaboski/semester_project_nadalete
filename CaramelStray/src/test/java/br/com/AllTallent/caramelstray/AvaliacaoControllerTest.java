@@ -138,9 +138,6 @@ class AvaliacaoControllerTest {
         verify(avaliacaoService, never()).criarAvaliacaoCompleta(any());
     }
 
-    // -------------------------------------------------------------------------
-    // GET /api/avaliacoes
-    // -------------------------------------------------------------------------
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -312,10 +309,6 @@ class AvaliacaoControllerTest {
                 .andExpect(status().isInternalServerError());
     }
 
-    // -------------------------------------------------------------------------
-    // GET /api/avaliacoes/instancias/{instanciaId}/respostas
-    // -------------------------------------------------------------------------
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void buscarRespostasPorInstancia_deveRetornar200ComLista() throws Exception {
@@ -340,9 +333,6 @@ class AvaliacaoControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    // -------------------------------------------------------------------------
-    // GET /api/avaliacoes/revisao/{codigoAvaliacaoFuncionario}
-    // -------------------------------------------------------------------------
 
     @Test
     @WithMockUser(roles = "ADMIN")
@@ -435,9 +425,6 @@ class AvaliacaoControllerTest {
                 .andExpect(status().isInternalServerError());
     }
 
-    // -------------------------------------------------------------------------
-    // GET /api/avaliacoes/pendentes/{funcionarioId}
-    // -------------------------------------------------------------------------
 
     @Test
     @WithCustomUser(codigo = 5)
@@ -456,10 +443,6 @@ class AvaliacaoControllerTest {
 
         verify(avaliacaoService, never()).buscarPendentesPorFuncionario(any());
     }
-
-    // -------------------------------------------------------------------------
-    // GET /api/avaliacoes/instancias/{instanciaId}/responder
-    // -------------------------------------------------------------------------
 
     @Test
     @WithMockUser

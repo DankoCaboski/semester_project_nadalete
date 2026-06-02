@@ -4,7 +4,6 @@ import br.com.AllTallent.model.Avaliacao;
 import java.time.LocalDate;
 import java.util.Collections; 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 public record AvaliacaoDetalhadaDTO(
@@ -29,14 +28,14 @@ public record AvaliacaoDetalhadaDTO(
             (avaliacao.getPerguntas() != null) ?
                 avaliacao.getPerguntas().stream()
                     .map(PerguntaResponseDTO::new) 
-                    .collect(Collectors.toList())
+                    .toList()
                 : Collections.emptyList(), 
 
             
             (avaliacao.getInstanciasAvaliacao() != null) ?
                 avaliacao.getInstanciasAvaliacao().stream()
                     .map(AvaliacaoFuncionarioResponseDTO::new) 
-                    .collect(Collectors.toList())
+                    .toList()
                 : Collections.emptyList() 
         );
     }

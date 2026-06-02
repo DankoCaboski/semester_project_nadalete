@@ -304,8 +304,9 @@ class FuncionarioServiceTest {
 
         when(funcionarioRepository.findByIdCompleto(50)).thenReturn(Optional.of(alvo));
 
+        List<Integer> ids = List.of(1);
         assertThrows(UnauthorizedActionException.class,
-                () -> funcionarioService.associarCompetencias(50, List.of(1)));
+                () -> funcionarioService.associarCompetencias(50, ids));
     }
 
     @Test
@@ -317,8 +318,9 @@ class FuncionarioServiceTest {
         // Retorna lista menor → competência 999 não existe
         when(competenciaRepository.findAllById(List.of(999))).thenReturn(List.of());
 
+        List<Integer> ids = List.of(999);
         assertThrows(ResourceNotFoundException.class,
-                () -> funcionarioService.associarCompetencias(5, List.of(999)));
+                () -> funcionarioService.associarCompetencias(5, ids));
     }
 
 
