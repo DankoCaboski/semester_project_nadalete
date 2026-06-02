@@ -1,6 +1,5 @@
 package br.com.AllTallent.service;
 
-import java.util.stream.Collectors;
 import java.util.List;
 import br.com.AllTallent.dto.*;
 import br.com.AllTallent.exception.ResourceNotFoundException;
@@ -23,12 +22,17 @@ import br.com.AllTallent.config.CustomUserDetails;
 @Service
 public class AvaliacaoService {
 
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+    private static final String ROLE_GESTOR = "ROLE_GESTOR";
+
     private final AvaliacaoRepository avaliacaoRepository;
     private final FuncionarioRepository funcionarioRepository;
     private final PerguntaRepository perguntaRepository;
     private final AvaliacaoFuncionarioRepository avaliacaoFuncionarioRepository;
     private final RespostaColaboradorRepository respostaColaboradorRepository;
     private final PerguntaOpcaoRepository perguntaOpcaoRepository;
+
+    private static final String msgInfoInstAvaliaca = "Instância de avaliação não encontrada: ";
 
     public AvaliacaoService(AvaliacaoRepository avaliacaoRepository,
                             FuncionarioRepository funcionarioRepository,
@@ -64,12 +68,12 @@ public class AvaliacaoService {
         boolean mesmoSetor = avaliador.getAreaId().equals(avaliado.getArea().getCodigo());
         int perfilAlvoId = avaliado.getPerfil().getCodigo();
 
-        if (avaliador.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR")) &&
-            !avaliador.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+        if (avaliador.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_GESTOR)) &&
+            !avaliador.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_ADMIN))) {
             boolean alvoEhColaborador = (perfilAlvoId == 3);
             return mesmoSetor && alvoEhColaborador;
         }
-        if (avaliador.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+        if (avaliador.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_ADMIN))) {
             boolean alvoEhTime = (perfilAlvoId == 2 || perfilAlvoId == 3);
             return mesmoSetor && alvoEhTime;
         }
@@ -124,7 +128,7 @@ public class AvaliacaoService {
         List<Avaliacao> todasAvaliacoes = avaliacaoRepository.findAll();
 
         // Regra do Perfil 1 (Diretor)
-        if (usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+        if (usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_ADMIN))) {
             return todasAvaliacoes.stream()
                 // 1. Filtra avaliações sem criador (antigas)
                 .filter(aval -> aval.getCriador() != null)
@@ -132,11 +136,11 @@ public class AvaliacaoService {
                 .filter(aval -> aval.getCriador().getArea() != null &&
                                 Objects.equals(aval.getCriador().getArea().getCodigo(), usuarioLogado.getAreaId()))
                 .map(AvaliacaoResponseDTO::new)
-                .collect(Collectors.toList());
+                .toList();
         }
 
         // Regra do Perfil 2 (Supervisor)
-        if (usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR"))) {
+        if (usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_GESTOR))) {
              return todasAvaliacoes.stream()
                 // 1. Filtra avaliações sem criador (antigas)
                 .filter(aval -> aval.getCriador() != null)
@@ -146,7 +150,7 @@ public class AvaliacaoService {
                 // 3. Filtra para ver APENAS as que ele mesmo criou
                 .filter(aval -> Objects.equals(aval.getCriador().getCodigo(), usuarioLogado.getCodigo()))
                 .map(AvaliacaoResponseDTO::new)
-                .collect(Collectors.toList());
+                .toList();
         }
 
         // Se não for nenhum dos dois (ex: USER), retorna lista vazia
@@ -182,7 +186,7 @@ public class AvaliacaoService {
 
         return avaliacaoFuncionarioRepository.findByAvaliacaoCodigo(avaliacaoId).stream()
                .map(AvaliacaoFuncionarioResponseDTO::new)
-               .collect(Collectors.toList());
+               .toList();
     }
 
     // --- MÉTODO ATUALIZADO ---
@@ -190,14 +194,14 @@ public class AvaliacaoService {
     public List<RespostaColaboradorResponseDTO> buscarRespostasPorInstancia(Long instanciaId) {
         CustomUserDetails usuarioLogado = getUsuarioLogado();
         AvaliacaoFuncionario instancia = avaliacaoFuncionarioRepository.findById(instanciaId)
-            .orElseThrow(() -> new EntityNotFoundException("Instância de avaliação não encontrada: " + instanciaId));
+            .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + instanciaId));
 
         // Validação de Segurança (Pode ver as respostas se puder ver a avaliação mestre)
         validarPermissaoDeAcesso(usuarioLogado, instancia.getAvaliacao());
 
         return respostaColaboradorRepository.findByAvaliacaoFuncionarioCodigo(instanciaId).stream()
                .map(RespostaColaboradorResponseDTO::new)
-               .collect(Collectors.toList());
+               .toList();
     }
 
 
@@ -218,8 +222,8 @@ public class AvaliacaoService {
         }
 
         // Se for Supervisor (GESTOR), verifica se ele é o criador
-        if (usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTOR")) &&
-            !usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+        if (usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_GESTOR)) &&
+            !usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_ADMIN))) {
 
             if (!Objects.equals(criadorAvaliacaoId, usuarioLogadoId)) {
                 throw new UnauthorizedActionException("Permissão negada. Supervisores só podem ver avaliações que eles mesmos criaram.");
@@ -239,7 +243,7 @@ public class AvaliacaoService {
     public RespostaColaboradorResponseDTO salvarOuAtualizarResposta(RespostaColaboradorRequestDTO dto) {
         CustomUserDetails usuarioLogado = getUsuarioLogado();
         AvaliacaoFuncionario avaliacaoFunc = avaliacaoFuncionarioRepository.findById(dto.funcionarioAvaliacaoCodigo())
-                .orElseThrow(() -> new EntityNotFoundException("Instância de avaliação não encontrada: " + dto.funcionarioAvaliacaoCodigo()));
+                .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + dto.funcionarioAvaliacaoCodigo()));
         if (!avaliacaoFunc.getFuncionario().getCodigo().equals(usuarioLogado.getCodigo())) {
             throw new UnauthorizedActionException("Permissão negada. Você só pode salvar respostas para suas próprias avaliações.");
         }
@@ -268,7 +272,7 @@ public class AvaliacaoService {
     public AvaliacaoFuncionarioResponseDTO salvarRevisaoSupervisor(Long instanciaId, RevisaoSupervisorRequestDTO dto) {
         CustomUserDetails avaliadorLogado = getUsuarioLogado();
         AvaliacaoFuncionario instancia = avaliacaoFuncionarioRepository.findById(instanciaId)
-                .orElseThrow(() -> new EntityNotFoundException("Instância de avaliação não encontrada: " + instanciaId));
+                .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + instanciaId));
         if (!podeAvaliar(avaliadorLogado, instancia.getFuncionario())) {
              throw new UnauthorizedActionException("Permissão negada. Você não pode revisar esta avaliação.");
         }
@@ -284,7 +288,7 @@ public class AvaliacaoService {
     public AvaliacaoParaResponderDTO buscarParaResponder(Long instanciaId) {
         CustomUserDetails usuarioLogado = getUsuarioLogado();
          AvaliacaoFuncionario instancia = avaliacaoFuncionarioRepository.findById(instanciaId)
-            .orElseThrow(() -> new EntityNotFoundException("Instância de avaliação não encontrada: " + instanciaId));
+            .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + instanciaId));
         if (!instancia.getFuncionario().getCodigo().equals(usuarioLogado.getCodigo())) {
             throw new UnauthorizedActionException("Permissão negada. Você só pode responder suas próprias avaliações.");
         }
@@ -301,7 +305,7 @@ public class AvaliacaoService {
     public void finalizarPeloColaborador(Long instanciaId) {
         CustomUserDetails usuarioLogado = getUsuarioLogado();
          AvaliacaoFuncionario instancia = avaliacaoFuncionarioRepository.findById(instanciaId)
-            .orElseThrow(() -> new EntityNotFoundException("Instância de avaliação não encontrada: " + instanciaId));
+            .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + instanciaId));
         if (!instancia.getFuncionario().getCodigo().equals(usuarioLogado.getCodigo())) {
             throw new UnauthorizedActionException("Permissão negada. Você só pode finalizar suas próprias avaliações.");
         }
@@ -318,7 +322,7 @@ public class AvaliacaoService {
         return avaliacaoFuncionarioRepository.findByFuncionarioCodigo(funcionarioId).stream()
                .filter(af -> "PENDENTE".equals(af.getResultadoStatus()))
                .map(AvaliacaoFuncionarioResponseDTO::new)
-               .collect(Collectors.toList());
+               .toList();
     }
 
      @Transactional(readOnly = true)
@@ -326,7 +330,7 @@ public class AvaliacaoService {
         // Validação de segurança já ocorre em salvarRevisaoSupervisor,
         // mas idealmente deveria ser adicionada aqui também.
          AvaliacaoFuncionario instancia = avaliacaoFuncionarioRepository.findById(instanciaId)
-            .orElseThrow(() -> new EntityNotFoundException("Instância de avaliação não encontrada: " + instanciaId));
+            .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + instanciaId));
          Hibernate.initialize(instancia.getFuncionario());
          Avaliacao avaliacaoBase = instancia.getAvaliacao();
          Hibernate.initialize(avaliacaoBase);
@@ -359,11 +363,11 @@ public class AvaliacaoService {
 
             return RevisaoDetalhadaDTO.builder()
                 .perguntaId(resp.getPergunta().getCodigo())
-                .perguntaTexto(resp.getPergunta().getPergunta())
+                .perguntaTexto(resp.getPergunta().getEnunciado())
                 .respostaDada(resp.getRespostaTexto())
                 .opcaoSelecionadaId(idOpcao) // Usa a variável que calculamos acima
                 .build();
-        }).collect(Collectors.toList());
+        }).toList();
     }
 
 

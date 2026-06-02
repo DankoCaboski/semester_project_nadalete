@@ -33,7 +33,7 @@ class AvaliacaoDetalhadaDTOTest {
     private Pergunta pergunta(long codigo, String texto) {
         Pergunta p = new Pergunta();
         p.setCodigo(codigo);
-        p.setPergunta(texto);
+        p.setEnunciado(texto);
         return p;
     }
 

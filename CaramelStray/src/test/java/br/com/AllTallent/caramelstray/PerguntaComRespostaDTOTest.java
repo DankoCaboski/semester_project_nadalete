@@ -16,7 +16,7 @@ class PerguntaComRespostaDTOTest {
     private Pergunta pergunta(long codigo, String texto, String tipo) {
         Pergunta p = new Pergunta();
         p.setCodigo(codigo);
-        p.setPergunta(texto);
+        p.setEnunciado(texto);
         p.setTipoPergunta(tipo);
         return p;
     }

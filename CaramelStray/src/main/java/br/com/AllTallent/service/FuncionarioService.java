@@ -39,6 +39,8 @@ public class FuncionarioService {
     private final CertificadoRepository certificadoRepository; 
     private final PasswordEncoder passwordEncoder;
 
+    private static final String msgInfofuncNaoEncontrado = "Funcionário não encontrado com o ID: ";
+
    public FuncionarioService(
         FuncionarioRepository funcionarioRepository, 
         AreaRepository areaRepository, 
@@ -57,13 +59,6 @@ public class FuncionarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /*
-    @Transactional(readOnly = true)
-    public List<FuncionarioResponseDTO> listarTodos() {
-        return funcionarioRepository.findAll().stream()
-                .map(FuncionarioResponseDTO::new)
-                .collect(Collectors.toList());
-    }*/
 
     @Transactional(readOnly = true)
     public List<FuncionarioResponseDTO> listarTodos(String texto) {
@@ -86,7 +81,7 @@ public class FuncionarioService {
     public FuncionarioResponseDTO buscarPorId(Integer id) {
         return funcionarioRepository.findById(id)
                 .map(FuncionarioResponseDTO::new)
-                .orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado com o ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(msgInfofuncNaoEncontrado + id));
     }
 
     @Transactional
@@ -100,7 +95,7 @@ public class FuncionarioService {
     @Transactional
     public FuncionarioResponseDTO atualizar(Integer id, FuncionarioRequestDTO dto) {
         Funcionario funcionarioExistente = funcionarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado com o ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(msgInfofuncNaoEncontrado + id));
 
         mapearDtoParaEntidade(dto, funcionarioExistente);
         Funcionario funcionarioSalvo = funcionarioRepository.save(funcionarioExistente);
@@ -110,7 +105,7 @@ public class FuncionarioService {
     @Transactional
     public void deletar(Integer id) {
         if (!funcionarioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Funcionário não encontrado com o ID: " + id);
+            throw new ResourceNotFoundException(msgInfofuncNaoEncontrado + id);
         }
         funcionarioRepository.deleteById(id);
     }
@@ -149,11 +144,11 @@ public class FuncionarioService {
     public FuncionarioPerfilDTO buscarPerfilPorId(Integer id) {
     return funcionarioRepository.findByIdCompleto(id)
             .map(FuncionarioPerfilDTO::new) 
-            .orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado com o ID: " + id));
+            .orElseThrow(() -> new ResourceNotFoundException(msgInfofuncNaoEncontrado + id));
     }
     public CertificadoDTO adicionarCertificado(Integer funcionarioId, CertificadoRequestDTO dto) {
         Funcionario funcionario = funcionarioRepository.findById(funcionarioId)
-                .orElseThrow(() -> new EntityNotFoundException("Funcionário não encontrado com o ID: " + funcionarioId));
+                .orElseThrow(() -> new EntityNotFoundException(msgInfofuncNaoEncontrado + funcionarioId));
 
         FuncionarioCertificado novoCertificado = new FuncionarioCertificado();
         novoCertificado.setCertificado(dto.nome());
@@ -229,19 +224,19 @@ public class FuncionarioService {
      @Transactional(readOnly = true)
     public Funcionario buscarFuncionarioCompleto(Integer id) {
         return funcionarioRepository.findByIdCompleto(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado com o ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(msgInfofuncNaoEncontrado + id));
     }
     @Transactional(readOnly = true)
     public FuncionarioExperienciasResponseDTO listarExperienciasPorFuncionario(Integer id) {
         Funcionario funcionario = funcionarioRepository.findByIdCompleto(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado com o ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(msgInfofuncNaoEncontrado + id));
         
         return new FuncionarioExperienciasResponseDTO(funcionario);
     }
     @Transactional
     public ExperienciaDTO adicionarExperiencia(Integer funcionarioId, ExperienciaRequestDTO dto) {
         Funcionario funcionario = funcionarioRepository.findById(funcionarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado com o ID: " + funcionarioId));
+                .orElseThrow(() -> new ResourceNotFoundException(msgInfofuncNaoEncontrado + funcionarioId));
 
         Experiencia novaExperiencia = new Experiencia();
         novaExperiencia.setCargo(dto.cargo());

@@ -2,7 +2,6 @@ package br.com.AllTallent.controller;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,7 +33,7 @@ public class CompetenciaController {
     public ResponseEntity<List<CompetenciaDTO>> listar() {
         List<CompetenciaDTO> dtos = competenciaRepository.findAll().stream()
                 .map(CompetenciaDTO::new) 
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(dtos);
     }
 

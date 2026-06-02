@@ -951,7 +951,7 @@ class AvaliacaoServiceTest {
     void buscarDadosRevisao_retornaDTOs_comOpcaoSelecionadaNula() {
         Pergunta pergunta = new Pergunta();
         pergunta.setCodigo(10L);
-        pergunta.setPergunta("Como foi seu desempenho?");
+        pergunta.setEnunciado("Como foi seu desempenho?");
 
         RespostaColaborador resposta = new RespostaColaborador();
         resposta.setCodigo(1L);
@@ -975,7 +975,7 @@ class AvaliacaoServiceTest {
     void buscarDadosRevisao_retornaDTOs_comOpcaoSelecionadaPreenchida() {
         Pergunta pergunta = new Pergunta();
         pergunta.setCodigo(10L);
-        pergunta.setPergunta("Qual opção?");
+        pergunta.setEnunciado("Qual opção?");
 
         PerguntaOpcao opcao = new PerguntaOpcao();
         opcao.setCodigo(5L);
