@@ -23,11 +23,19 @@ public record AvaliacaoRevisaoDTO(
             avaliacaoBase.getTitulo(),
             instancia.getComentarioColaborador(),
             instancia.getResultadoStatus(),
-            (avaliacaoBase.getPerguntas() != null) ?
-                avaliacaoBase.getPerguntas().stream()
-                    .map(pergunta -> new PerguntaComRespostaDTO(pergunta, (instancia.getRespostas() != null ? List.copyOf(instancia.getRespostas()) : Collections.<RespostaColaborador>emptyList()) ))
-                    .collect(Collectors.toList())
-                : Collections.emptyList()
+            mapPerguntas(instancia, avaliacaoBase)
         );
+    }
+
+    private static List<PerguntaComRespostaDTO> mapPerguntas(AvaliacaoFuncionario instancia, Avaliacao avaliacaoBase) {
+        List<RespostaColaborador> respostas = instancia.getRespostas() != null
+            ? List.copyOf(instancia.getRespostas())
+            : Collections.emptyList();
+        if (avaliacaoBase.getPerguntas() == null) {
+            return Collections.emptyList();
+        }
+        return avaliacaoBase.getPerguntas().stream()
+            .map(pergunta -> new PerguntaComRespostaDTO(pergunta, respostas))
+            .collect(Collectors.toList());
     }
 }
