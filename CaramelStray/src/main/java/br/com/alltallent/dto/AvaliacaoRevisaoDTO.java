@@ -6,7 +6,6 @@ import br.com.alltallent.model.RespostaColaborador;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public record AvaliacaoRevisaoDTO(
     Long avaliacaoFuncionarioCodigo,
@@ -14,7 +13,7 @@ public record AvaliacaoRevisaoDTO(
     String tituloAvaliacao,
     String comentarioColaborador,
     String statusAtual,
-    List<PerguntaComRespostaDTO> perguntasComRespostas 
+    List<PerguntaComRespostaDTO> perguntasComRespostas
 ) {
     public AvaliacaoRevisaoDTO(AvaliacaoFuncionario instancia, Avaliacao avaliacaoBase) {
         this(
@@ -36,6 +35,6 @@ public record AvaliacaoRevisaoDTO(
         }
         return avaliacaoBase.getPerguntas().stream()
             .map(pergunta -> new PerguntaComRespostaDTO(pergunta, respostas))
-            .collect(Collectors.toList());
+            .toList();
     }
 }
