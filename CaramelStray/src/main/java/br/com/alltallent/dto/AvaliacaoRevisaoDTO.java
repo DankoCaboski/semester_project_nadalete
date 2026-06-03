@@ -6,7 +6,6 @@ import br.com.alltallent.model.RespostaColaborador;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public record AvaliacaoRevisaoDTO(
     Long avaliacaoFuncionarioCodigo,
@@ -14,7 +13,7 @@ public record AvaliacaoRevisaoDTO(
     String tituloAvaliacao,
     String comentarioColaborador,
     String statusAtual,
-    List<PerguntaComRespostaDTO> perguntasComRespostas 
+    List<PerguntaComRespostaDTO> perguntasComRespostas
 ) {
     public AvaliacaoRevisaoDTO(AvaliacaoFuncionario instancia, Avaliacao avaliacaoBase) {
         this(
@@ -23,11 +22,19 @@ public record AvaliacaoRevisaoDTO(
             avaliacaoBase.getTitulo(),
             instancia.getComentarioColaborador(),
             instancia.getResultadoStatus(),
-            (avaliacaoBase.getPerguntas() != null) ?
-                avaliacaoBase.getPerguntas().stream()
-                    .map(pergunta -> new PerguntaComRespostaDTO(pergunta, (instancia.getRespostas() != null ? List.copyOf(instancia.getRespostas()) : Collections.<RespostaColaborador>emptyList()) ))
-                    .collect(Collectors.toList())
-                : Collections.emptyList()
+            mapPerguntas(instancia, avaliacaoBase)
         );
+    }
+
+    private static List<PerguntaComRespostaDTO> mapPerguntas(AvaliacaoFuncionario instancia, Avaliacao avaliacaoBase) {
+        List<RespostaColaborador> respostas = instancia.getRespostas() != null
+            ? List.copyOf(instancia.getRespostas())
+            : Collections.emptyList();
+        if (avaliacaoBase.getPerguntas() == null) {
+            return Collections.emptyList();
+        }
+        return avaliacaoBase.getPerguntas().stream()
+            .map(pergunta -> new PerguntaComRespostaDTO(pergunta, respostas))
+            .toList();
     }
 }
