@@ -26,7 +26,7 @@ class JwtServiceTest {
         // Gera uma chave HS256 válida para uso nos testes e injeta via reflection
         String base64Key = Encoders.BASE64.encode(
                 Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded());
-        ReflectionTestUtils.setField(jwtService, "SECRET_KEY", base64Key);
+        ReflectionTestUtils.setField(jwtService, "secretKey", base64Key);
     }
 
     // -------------------------------------------------------------------------

@@ -273,8 +273,9 @@ class FuncionarioServiceTest {
 
         when(funcionarioRepository.findByIdCompleto(99)).thenReturn(Optional.of(alvo));
 
+        List<Integer> competencias = List.of(1);
         assertThrows(UnauthorizedActionException.class,
-                () -> funcionarioService.associarCompetencias(99, List.of(1)));
+                () -> funcionarioService.associarCompetencias(99, competencias));
     }
 
     @Test

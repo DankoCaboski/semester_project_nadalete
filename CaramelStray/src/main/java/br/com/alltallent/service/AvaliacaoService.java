@@ -32,7 +32,7 @@ public class AvaliacaoService {
     private final RespostaColaboradorRepository respostaColaboradorRepository;
     private final PerguntaOpcaoRepository perguntaOpcaoRepository;
 
-    private static final String msgInfoInstAvaliaca = "Instância de avaliação não encontrada: ";
+    private static final String MSG_INFO_INST_AVALIACA = "Instância de avaliação não encontrada: ";
 
     public AvaliacaoService(AvaliacaoRepository avaliacaoRepository,
                             FuncionarioRepository funcionarioRepository,
@@ -69,7 +69,7 @@ public class AvaliacaoService {
         int perfilAlvoId = avaliado.getPerfil().getCodigo();
 
         if (avaliador.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_GESTOR)) &&
-            !avaliador.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_ADMIN))) {
+            avaliador.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(ROLE_ADMIN))) {
             boolean alvoEhColaborador = (perfilAlvoId == 3);
             return mesmoSetor && alvoEhColaborador;
         }
@@ -194,7 +194,7 @@ public class AvaliacaoService {
     public List<RespostaColaboradorResponseDTO> buscarRespostasPorInstancia(Long instanciaId) {
         CustomUserDetails usuarioLogado = getUsuarioLogado();
         AvaliacaoFuncionario instancia = avaliacaoFuncionarioRepository.findById(instanciaId)
-            .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + instanciaId));
+            .orElseThrow(() -> new EntityNotFoundException(MSG_INFO_INST_AVALIACA + instanciaId));
 
         // Validação de Segurança (Pode ver as respostas se puder ver a avaliação mestre)
         validarPermissaoDeAcesso(usuarioLogado, instancia.getAvaliacao());
@@ -223,7 +223,7 @@ public class AvaliacaoService {
 
         // Se for Supervisor (GESTOR), verifica se ele é o criador
         if (usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_GESTOR)) &&
-            !usuarioLogado.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ROLE_ADMIN))) {
+            usuarioLogado.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals(ROLE_ADMIN))) {
 
             if (!Objects.equals(criadorAvaliacaoId, usuarioLogadoId)) {
                 throw new UnauthorizedActionException("Permissão negada. Supervisores só podem ver avaliações que eles mesmos criaram.");
@@ -243,7 +243,7 @@ public class AvaliacaoService {
     public RespostaColaboradorResponseDTO salvarOuAtualizarResposta(RespostaColaboradorRequestDTO dto) {
         CustomUserDetails usuarioLogado = getUsuarioLogado();
         AvaliacaoFuncionario avaliacaoFunc = avaliacaoFuncionarioRepository.findById(dto.funcionarioAvaliacaoCodigo())
-                .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + dto.funcionarioAvaliacaoCodigo()));
+                .orElseThrow(() -> new EntityNotFoundException(MSG_INFO_INST_AVALIACA + dto.funcionarioAvaliacaoCodigo()));
         if (!avaliacaoFunc.getFuncionario().getCodigo().equals(usuarioLogado.getCodigo())) {
             throw new UnauthorizedActionException("Permissão negada. Você só pode salvar respostas para suas próprias avaliações.");
         }
@@ -272,7 +272,7 @@ public class AvaliacaoService {
     public AvaliacaoFuncionarioResponseDTO salvarRevisaoSupervisor(Long instanciaId, RevisaoSupervisorRequestDTO dto) {
         CustomUserDetails avaliadorLogado = getUsuarioLogado();
         AvaliacaoFuncionario instancia = avaliacaoFuncionarioRepository.findById(instanciaId)
-                .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + instanciaId));
+                .orElseThrow(() -> new EntityNotFoundException(MSG_INFO_INST_AVALIACA + instanciaId));
         if (!podeAvaliar(avaliadorLogado, instancia.getFuncionario())) {
              throw new UnauthorizedActionException("Permissão negada. Você não pode revisar esta avaliação.");
         }
@@ -288,7 +288,7 @@ public class AvaliacaoService {
     public AvaliacaoParaResponderDTO buscarParaResponder(Long instanciaId) {
         CustomUserDetails usuarioLogado = getUsuarioLogado();
          AvaliacaoFuncionario instancia = avaliacaoFuncionarioRepository.findById(instanciaId)
-            .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + instanciaId));
+            .orElseThrow(() -> new EntityNotFoundException(MSG_INFO_INST_AVALIACA + instanciaId));
         if (!instancia.getFuncionario().getCodigo().equals(usuarioLogado.getCodigo())) {
             throw new UnauthorizedActionException("Permissão negada. Você só pode responder suas próprias avaliações.");
         }
@@ -305,7 +305,7 @@ public class AvaliacaoService {
     public void finalizarPeloColaborador(Long instanciaId) {
         CustomUserDetails usuarioLogado = getUsuarioLogado();
          AvaliacaoFuncionario instancia = avaliacaoFuncionarioRepository.findById(instanciaId)
-            .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + instanciaId));
+            .orElseThrow(() -> new EntityNotFoundException(MSG_INFO_INST_AVALIACA + instanciaId));
         if (!instancia.getFuncionario().getCodigo().equals(usuarioLogado.getCodigo())) {
             throw new UnauthorizedActionException("Permissão negada. Você só pode finalizar suas próprias avaliações.");
         }
@@ -330,7 +330,7 @@ public class AvaliacaoService {
         // Validação de segurança já ocorre em salvarRevisaoSupervisor,
         // mas idealmente deveria ser adicionada aqui também.
          AvaliacaoFuncionario instancia = avaliacaoFuncionarioRepository.findById(instanciaId)
-            .orElseThrow(() -> new EntityNotFoundException(msgInfoInstAvaliaca + instanciaId));
+            .orElseThrow(() -> new EntityNotFoundException(MSG_INFO_INST_AVALIACA + instanciaId));
          Hibernate.initialize(instancia.getFuncionario());
          Avaliacao avaliacaoBase = instancia.getAvaliacao();
          Hibernate.initialize(avaliacaoBase);
