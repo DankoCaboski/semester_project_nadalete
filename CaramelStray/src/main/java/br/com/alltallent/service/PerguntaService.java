@@ -3,7 +3,6 @@ package br.com.alltallent.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +75,7 @@ public class PerguntaService {
     public List<PerguntaResponseDTO> listarTodas() {
         return perguntaRepository.findAll().stream()
                 .map(PerguntaResponseDTO::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
      
