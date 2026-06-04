@@ -3,7 +3,6 @@ package br.com.alltallent.service;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -67,13 +66,13 @@ public class FuncionarioService {
             return funcionarioRepository.findAll()
                     .stream()
                     .map(FuncionarioResponseDTO::new)
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
         return funcionarioRepository.buscarPorTexto(texto)
                 .stream()
                 .map(FuncionarioResponseDTO::new)
-                .collect(Collectors.toList());
+                .toList();
     }
 
 
