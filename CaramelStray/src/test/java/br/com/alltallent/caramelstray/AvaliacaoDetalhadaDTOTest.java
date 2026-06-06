@@ -5,6 +5,7 @@ import br.com.alltallent.model.*;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,8 +19,8 @@ class AvaliacaoDetalhadaDTOTest {
         a.setCodigo(1);
         a.setTitulo("Avaliação Anual");
         a.setStatus("Rascunho");
-        a.setDataCriacao(LocalDate.of(2025, 1, 10));
-        a.setDataPrazo(LocalDate.of(2025, 3, 31));
+        a.setDataCriacao(LocalDate.of(2025, Month.JANUARY, 10));
+        a.setDataPrazo(LocalDate.of(2025, Month.MARCH, 31));
         return a;
     }
 
@@ -48,14 +49,14 @@ class AvaliacaoDetalhadaDTOTest {
     void canonicalConstructor_defineCamposCorretamente() {
         var dto = new AvaliacaoDetalhadaDTO(
                 99, "Título", "Ativo",
-                LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31),
+                LocalDate.of(2025, Month.JANUARY, 1), LocalDate.of(2025, Month.DECEMBER, 31),
                 "Criador X", List.of(), List.of());
 
         assertEquals(99, dto.codigo());
         assertEquals("Título", dto.titulo());
         assertEquals("Ativo", dto.status());
-        assertEquals(LocalDate.of(2025, 1, 1), dto.dataCriacao());
-        assertEquals(LocalDate.of(2025, 12, 31), dto.dataPrazo());
+        assertEquals(LocalDate.of(2025, Month.JANUARY, 1), dto.dataCriacao());
+        assertEquals(LocalDate.of(2025, Month.DECEMBER, 31), dto.dataPrazo());
         assertEquals("Criador X", dto.nomeCriador());
         assertTrue(dto.perguntas().isEmpty());
         assertTrue(dto.instancias().isEmpty());
@@ -70,8 +71,8 @@ class AvaliacaoDetalhadaDTOTest {
         assertEquals(1, dto.codigo());
         assertEquals("Avaliação Anual", dto.titulo());
         assertEquals("Rascunho", dto.status());
-        assertEquals(LocalDate.of(2025, 1, 10), dto.dataCriacao());
-        assertEquals(LocalDate.of(2025, 3, 31), dto.dataPrazo());
+        assertEquals(LocalDate.of(2025, Month.JANUARY, 10), dto.dataCriacao());
+        assertEquals(LocalDate.of(2025, Month.MARCH, 31), dto.dataPrazo());
     }
 
     @Test
