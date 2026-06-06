@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,7 +49,7 @@ class AuthServiceTest {
         d.setIdCracha("CRACHA-01");
         d.setCodigoArea(codigoArea);
         d.setCodigoPerfil(codigoPerfil);
-        d.setDataAdmissao(LocalDate.of(2024, 1, 15));
+        d.setDataAdmissao(LocalDate.of(2024, Month.JANUARY, 15));
         return d;
     }
 

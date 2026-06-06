@@ -6,6 +6,7 @@ import br.com.alltallent.model.Funcionario;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -66,7 +67,7 @@ class FuncionarioExperienciasResponseDTOTest {
     void fromFuncionario_comUmaExperiencia_mapeiaCorretamente() {
         Funcionario f = funcionarioSimples(4, "Ana");
         Experiencia exp = experiencia(10, "Dev", "Empresa X",
-                LocalDate.of(2020, 1, 1), LocalDate.of(2022, 6, 30), "Backend");
+                LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2022, Month.JUNE, 30), "Backend");
         f.setExperiencias(Set.of(exp));
 
         var dto = new FuncionarioExperienciasResponseDTO(f);
@@ -76,16 +77,16 @@ class FuncionarioExperienciasResponseDTOTest {
         assertEquals(10, expDto.codigo());
         assertEquals("Dev", expDto.cargo());
         assertEquals("Empresa X", expDto.empresa());
-        assertEquals(LocalDate.of(2020, 1, 1), expDto.dataInicio());
-        assertEquals(LocalDate.of(2022, 6, 30), expDto.dataFim());
+        assertEquals(LocalDate.of(2020, Month.JANUARY, 1), expDto.dataInicio());
+        assertEquals(LocalDate.of(2022, Month.JUNE, 30), expDto.dataFim());
         assertEquals("Backend", expDto.descricao());
     }
 
     @Test
     void fromFuncionario_comDuasExperiencias_retornaTamanhoCorreto() {
         Funcionario f = funcionarioSimples(5, "Carlos");
-        Experiencia e1 = experiencia(1, "Dev", "A", LocalDate.of(2018, 1, 1), null, null);
-        Experiencia e2 = experiencia(2, "QA",  "B", LocalDate.of(2021, 3, 1), null, null);
+        Experiencia e1 = experiencia(1, "Dev", "A", LocalDate.of(2018, Month.JANUARY, 1), null, null);
+        Experiencia e2 = experiencia(2, "QA",  "B", LocalDate.of(2021, Month.MARCH, 1), null, null);
         Set<Experiencia> set = new LinkedHashSet<>();
         set.add(e1);
         set.add(e2);
@@ -99,7 +100,7 @@ class FuncionarioExperienciasResponseDTOTest {
     @Test
     void fromFuncionario_experienciaSemDataFim_dataFimNula() {
         Funcionario f = funcionarioSimples(6, "Bia");
-        Experiencia exp = experiencia(20, "Analista", "Corp", LocalDate.of(2023, 1, 1), null, null);
+        Experiencia exp = experiencia(20, "Analista", "Corp", LocalDate.of(2023, Month.JANUARY, 1), null, null);
         f.setExperiencias(Set.of(exp));
 
         var dto = new FuncionarioExperienciasResponseDTO(f);
