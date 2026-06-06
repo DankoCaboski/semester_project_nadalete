@@ -23,6 +23,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.Collections;
 import java.util.List;
 
@@ -397,9 +398,9 @@ class FuncionarioControllerTest {
     @WithCustomUser(codigo = 5, perfilCodigo = 3)
     void adicionarExperiencia_retorna201_quandoProprioFuncionario() throws Exception {
         ExperienciaRequestDTO requestDTO = new ExperienciaRequestDTO(
-                "Dev", "Empresa", LocalDate.of(2022, 1, 1), null, null);
+                "Dev", "Empresa", LocalDate.of(2022, Month.JANUARY, 1), null, null);
         ExperienciaDTO resposta = new ExperienciaDTO(
-                1, "Dev", "Empresa", null, LocalDate.of(2022, 1, 1), null);
+                1, "Dev", "Empresa", null, LocalDate.of(2022, Month.JANUARY, 1), null);
 
         when(funcionarioService.adicionarExperiencia(eq(5), any())).thenReturn(resposta);
 
@@ -414,7 +415,7 @@ class FuncionarioControllerTest {
     @WithCustomUser(codigo = 5, perfilCodigo = 3)
     void adicionarExperiencia_retorna403_quandoColaboradorAdicionaEmOutro() throws Exception {
         ExperienciaRequestDTO requestDTO = new ExperienciaRequestDTO(
-                "Dev", "Empresa", LocalDate.of(2022, 1, 1), null, null);
+                "Dev", "Empresa", LocalDate.of(2022, Month.JANUARY, 1), null, null);
 
         mockMvc.perform(post("/api/funcionario/99/experiencias")
                         .with(csrf())
@@ -428,9 +429,9 @@ class FuncionarioControllerTest {
     @WithMockUser(roles = "ADMIN")
     void atualizarExperiencia_retorna200_quandoAdmin() throws Exception {
         ExperienciaRequestDTO requestDTO = new ExperienciaRequestDTO(
-                "Sênior", "Corp", LocalDate.of(2020, 3, 1), null, null);
+                "Sênior", "Corp", LocalDate.of(2020, Month.MARCH, 1), null, null);
         ExperienciaDTO resposta = new ExperienciaDTO(
-                1, "Sênior", "Corp", null, LocalDate.of(2020, 3, 1), null);
+                1, "Sênior", "Corp", null, LocalDate.of(2020, Month.MARCH, 1), null);
 
         when(funcionarioService.atualizarExperiencia(eq(1), any())).thenReturn(resposta);
 
@@ -448,9 +449,9 @@ class FuncionarioControllerTest {
         when(funcionarioService.usuarioPodeEditarExperiencia(10, 5)).thenReturn(true);
 
         ExperienciaRequestDTO requestDTO = new ExperienciaRequestDTO(
-                "Júnior", "Corp", LocalDate.of(2021, 1, 1), null, null);
+                "Júnior", "Corp", LocalDate.of(2021, Month.JANUARY, 1), null, null);
         ExperienciaDTO resposta = new ExperienciaDTO(
-                10, "Júnior", "Corp", null, LocalDate.of(2021, 1, 1), null);
+                10, "Júnior", "Corp", null, LocalDate.of(2021, Month.JANUARY, 1), null);
 
         when(funcionarioService.atualizarExperiencia(eq(10), any())).thenReturn(resposta);
 
@@ -468,7 +469,7 @@ class FuncionarioControllerTest {
         when(funcionarioService.usuarioPodeEditarExperiencia(10, 5)).thenReturn(false);
 
         ExperienciaRequestDTO requestDTO = new ExperienciaRequestDTO(
-                "Pleno", "Corp", LocalDate.of(2021, 1, 1), null, null);
+                "Pleno", "Corp", LocalDate.of(2021, Month.JANUARY, 1), null, null);
 
         mockMvc.perform(put("/api/funcionario/experiencias/10")
                         .with(csrf())

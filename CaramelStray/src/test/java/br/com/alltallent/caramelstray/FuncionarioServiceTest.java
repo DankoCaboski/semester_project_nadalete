@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -396,7 +397,7 @@ class FuncionarioServiceTest {
     void adicionarExperiencia_salvaERetornaDTO() {
         Funcionario f = funcionarioSimples(1);
         ExperienciaRequestDTO dto = new ExperienciaRequestDTO(
-                "Dev", "Empresa X", LocalDate.of(2022, 1, 1), null, "Descrição");
+                "Dev", "Empresa X", LocalDate.of(2022, Month.JANUARY, 1), null, "Descrição");
 
         when(funcionarioRepository.findById(1)).thenReturn(Optional.of(f));
         when(funcionarioRepository.save(any())).thenReturn(f);
@@ -412,7 +413,7 @@ class FuncionarioServiceTest {
     @Test
     void adicionarExperiencia_lancaResourceNotFound_quandoFuncionarioNaoExiste() {
         ExperienciaRequestDTO dto = new ExperienciaRequestDTO(
-                "Dev", "Empresa", LocalDate.of(2022, 1, 1), null, null);
+                "Dev", "Empresa", LocalDate.of(2022, Month.JANUARY, 1), null, null);
 
         when(funcionarioRepository.findById(99)).thenReturn(Optional.empty());
 
@@ -424,7 +425,7 @@ class FuncionarioServiceTest {
     void adicionarExperiencia_retornaDTOComCamposCorretos() {
         Funcionario f = funcionarioSimples(1);
         ExperienciaRequestDTO dto = new ExperienciaRequestDTO(
-                "Analista", "Tech Corp", LocalDate.of(2021, 6, 1), LocalDate.of(2023, 12, 31), "Análise de sistemas");
+                "Analista", "Tech Corp", LocalDate.of(2021, Month.JUNE, 1), LocalDate.of(2023, Month.DECEMBER, 31), "Análise de sistemas");
 
         when(funcionarioRepository.findById(1)).thenReturn(Optional.of(f));
         when(funcionarioRepository.save(any())).thenReturn(f);
@@ -433,8 +434,8 @@ class FuncionarioServiceTest {
 
         assertEquals("Analista", resultado.cargo());
         assertEquals("Tech Corp", resultado.empresa());
-        assertEquals(LocalDate.of(2021, 6, 1), resultado.dataInicio());
-        assertEquals(LocalDate.of(2023, 12, 31), resultado.dataFim());
+        assertEquals(LocalDate.of(2021, Month.JUNE, 1), resultado.dataInicio());
+        assertEquals(LocalDate.of(2023, Month.DECEMBER, 31), resultado.dataFim());
         assertEquals("Análise de sistemas", resultado.descricao());
     }
 
@@ -733,7 +734,7 @@ class FuncionarioServiceTest {
         exp.setEmpresa("Empresa Antiga");
 
         ExperienciaRequestDTO dto = new ExperienciaRequestDTO(
-                "Sênior", "Nova Corp", LocalDate.of(2020, 1, 1), LocalDate.of(2024, 6, 30), "Nova desc");
+                "Sênior", "Nova Corp", LocalDate.of(2020, Month.JANUARY, 1), LocalDate.of(2024, Month.JUNE, 30), "Nova desc");
 
         when(experienciaRepository.findById(1)).thenReturn(Optional.of(exp));
         when(experienciaRepository.save(exp)).thenReturn(exp);
@@ -742,8 +743,8 @@ class FuncionarioServiceTest {
 
         assertEquals("Sênior", resultado.cargo());
         assertEquals("Nova Corp", resultado.empresa());
-        assertEquals(LocalDate.of(2020, 1, 1), resultado.dataInicio());
-        assertEquals(LocalDate.of(2024, 6, 30), resultado.dataFim());
+        assertEquals(LocalDate.of(2020, Month.JANUARY, 1), resultado.dataInicio());
+        assertEquals(LocalDate.of(2024, Month.JUNE, 30), resultado.dataFim());
         assertEquals("Nova desc", resultado.descricao());
         verify(experienciaRepository).save(exp);
     }
@@ -751,7 +752,7 @@ class FuncionarioServiceTest {
     @Test
     void atualizarExperiencia_lancaResourceNotFound_quandoNaoExiste() {
         ExperienciaRequestDTO dto = new ExperienciaRequestDTO(
-                "Dev", "Empresa", LocalDate.of(2022, 1, 1), null, null);
+                "Dev", "Empresa", LocalDate.of(2022, Month.JANUARY, 1), null, null);
 
         when(experienciaRepository.findById(99)).thenReturn(Optional.empty());
 
