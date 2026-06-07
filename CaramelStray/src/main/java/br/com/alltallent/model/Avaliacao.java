@@ -24,6 +24,7 @@ import lombok.Setter;
 
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Set;
 
 
@@ -78,7 +79,7 @@ public class Avaliacao {
     // --- Métodos ---
     @PrePersist
     protected void onCreate() {
-        this.dataCriacao = LocalDate.now();
+        this.dataCriacao = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
         if (this.status == null || this.status.trim().isEmpty()) {
             this.status = "Rascunho";
         }

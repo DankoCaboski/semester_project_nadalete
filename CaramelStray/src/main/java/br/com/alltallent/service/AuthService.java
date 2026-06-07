@@ -1,6 +1,14 @@
 package br.com.alltallent.service;
 
+import java.time.OffsetDateTime; // Importante para a data de cadastro
+import java.time.ZoneId;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import br.com.alltallent.dto.CadastroRequestDTO;
+import br.com.alltallent.exception.ResourceNotFoundException;
 import br.com.alltallent.model.Area;
 import br.com.alltallent.model.Funcionario;
 import br.com.alltallent.model.Perfil;
@@ -8,11 +16,6 @@ import br.com.alltallent.repository.AreaRepository;
 import br.com.alltallent.repository.FuncionarioRepository;
 import br.com.alltallent.repository.PerfilRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.OffsetDateTime; // Importante para a data de cadastro
 
 @Service
 @RequiredArgsConstructor
@@ -28,15 +31,15 @@ public class AuthService {
         
         // 1. Validar se o email já existe
         if (funcionarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Erro: Email já está em uso!");
+            throw new IllegalArgumentException("Erro: Email já está em uso!");
         }
 
         // 2. Buscar relacionamentos obrigatórios
         Area area = areaRepository.findById(request.getCodigoArea())
-                .orElseThrow(() -> new RuntimeException("Erro: Área (Departamento) não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Erro: Área (Departamento) não encontrada."));
 
         Perfil perfil = perfilRepository.findById(request.getCodigoPerfil())
-                .orElseThrow(() -> new RuntimeException("Erro: Perfil (Cargo) não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Erro: Perfil (Cargo) não encontrado."));
 
         // 3. Criptografia
         String senhaCriptografada = passwordEncoder.encode(request.getSenha());
@@ -59,12 +62,12 @@ public class AuthService {
         novoFuncionario.setDataAdmissao(request.getDataAdmissao());
         
         // --- DATA DE CADASTRO AUTOMÁTICA ---
-        novoFuncionario.setDataCadastro(OffsetDateTime.now()); 
+        novoFuncionario.setDataCadastro(OffsetDateTime.now(ZoneId.of("America/Sao_Paulo"))); 
 
         // Lógica do Gestor (Opcional)
         if (request.getCodigoGestor() != null) {
             Funcionario gestor = funcionarioRepository.findById(request.getCodigoGestor())
-                .orElseThrow(() -> new RuntimeException("Erro: Gestor informado não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Erro: Gestor informado não encontrado."));
             novoFuncionario.setGestor(gestor);
         }
         

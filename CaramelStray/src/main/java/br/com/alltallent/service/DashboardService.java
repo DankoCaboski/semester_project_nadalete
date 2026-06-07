@@ -1,16 +1,22 @@
 package br.com.alltallent.service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import br.com.alltallent.dto.AreaQuantidadeDTO;
+import br.com.alltallent.dto.CompetenciaQuantidadeDTO;
 // --- IMPORTAÇÕES ---
 import br.com.alltallent.dto.DashboardResponseDTO;
 import br.com.alltallent.dto.MesQuantidadeDTO;
-import br.com.alltallent.dto.MesQuantidadeProjection; 
-import br.com.alltallent.dto.AreaQuantidadeDTO;       
-import br.com.alltallent.dto.CompetenciaQuantidadeDTO;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
-
+import br.com.alltallent.dto.MesQuantidadeProjection;
 import br.com.alltallent.model.Avaliacao;
 import br.com.alltallent.model.AvaliacaoFuncionario;
 import br.com.alltallent.model.Funcionario;
@@ -19,13 +25,7 @@ import br.com.alltallent.repository.AvaliacaoFuncionarioRepository;
 import br.com.alltallent.repository.AvaliacaoRepository;
 import br.com.alltallent.repository.FuncionarioRepository;
 import br.com.alltallent.repository.RespostaColaboradorRepository;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional; 
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -55,7 +55,7 @@ public class DashboardService {
     public DashboardResponseDTO getDashboardData(Integer codigoAreaFiltro) {
 
         // --- Cálculos de Data ---
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
         LocalDate inicioMes = hoje.withDayOfMonth(1);
         LocalDate fimMes = hoje.withDayOfMonth(hoje.lengthOfMonth());
 

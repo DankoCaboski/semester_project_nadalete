@@ -17,6 +17,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -28,6 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AvaliacaoController.class)
 class AvaliacaoControllerTest {
+
+    private static final LocalDate FIXED_DATE = LocalDate.of(2025, Month.JANUARY, 10);
 
     @TestConfiguration
     @EnableMethodSecurity
@@ -50,7 +53,7 @@ class AvaliacaoControllerTest {
     @WithMockUser(roles = "ADMIN")
     void criarAvaliacao_deveRetornar201QuandoCriada() throws Exception {
         AvaliacaoResponseDTO resposta = new AvaliacaoResponseDTO(
-                1, "Avaliação Anual", "ABERTA", LocalDate.now(), LocalDate.now().plusDays(30), "Sistema"
+                1, "Avaliação Anual", "ABERTA", FIXED_DATE, FIXED_DATE.plusDays(30), "Sistema"
         );
         when(avaliacaoService.criarAvaliacaoCompleta(any(AvaliacaoRequestDTO.class))).thenReturn(resposta);
 
@@ -143,8 +146,8 @@ class AvaliacaoControllerTest {
     @WithMockUser(roles = "ADMIN")
     void listarTodasAvaliacoes_deveRetornar200ComLista() throws Exception {
         List<AvaliacaoResponseDTO> lista = List.of(
-                new AvaliacaoResponseDTO(1, "Avaliação A", "ABERTA", LocalDate.now(), LocalDate.now().plusDays(10), "Sistema"),
-                new AvaliacaoResponseDTO(2, "Avaliação B", "FECHADA", LocalDate.now(), LocalDate.now().plusDays(5), "Admin")
+                new AvaliacaoResponseDTO(1, "Avaliação A", "ABERTA", FIXED_DATE, FIXED_DATE.plusDays(10), "Sistema"),
+                new AvaliacaoResponseDTO(2, "Avaliação B", "FECHADA", FIXED_DATE, FIXED_DATE.plusDays(5), "Admin")
         );
         when(avaliacaoService.listarTodasAvaliacoes()).thenReturn(lista);
 
@@ -179,7 +182,7 @@ class AvaliacaoControllerTest {
     @WithMockUser(roles = "ADMIN")
     void buscarAvaliacaoDetalhada_deveRetornar200QuandoEncontrada() throws Exception {
         AvaliacaoDetalhadaDTO dto = new AvaliacaoDetalhadaDTO(
-                1, "Avaliação Anual", "ABERTA", LocalDate.now(), LocalDate.now().plusDays(30),
+                1, "Avaliação Anual", "ABERTA", FIXED_DATE, FIXED_DATE.plusDays(30),
                 "Sistema", List.of(), List.of()
         );
         when(avaliacaoService.buscarAvaliacaoDetalhada(1)).thenReturn(dto);
@@ -448,7 +451,7 @@ class AvaliacaoControllerTest {
     @WithMockUser
     void buscarAvaliacaoParaResponder_deveRetornar200QuandoEncontrada() throws Exception {
         AvaliacaoParaResponderDTO dto = new AvaliacaoParaResponderDTO(
-                1L, "Avaliação Anual", LocalDate.now().plusDays(10), List.of()
+                1L, "Avaliação Anual", FIXED_DATE.plusDays(10), List.of()
         );
         when(avaliacaoService.buscarParaResponder(1L)).thenReturn(dto);
 
