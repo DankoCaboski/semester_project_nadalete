@@ -1,5 +1,12 @@
 package br.com.alltallent.service;
 
+import java.time.OffsetDateTime; // Importante para a data de cadastro
+import java.time.ZoneId;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import br.com.alltallent.dto.CadastroRequestDTO;
 import br.com.alltallent.model.Area;
 import br.com.alltallent.model.Funcionario;
@@ -8,11 +15,6 @@ import br.com.alltallent.repository.AreaRepository;
 import br.com.alltallent.repository.FuncionarioRepository;
 import br.com.alltallent.repository.PerfilRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.OffsetDateTime; // Importante para a data de cadastro
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +61,7 @@ public class AuthService {
         novoFuncionario.setDataAdmissao(request.getDataAdmissao());
         
         // --- DATA DE CADASTRO AUTOMÁTICA ---
-        novoFuncionario.setDataCadastro(OffsetDateTime.now()); 
+        novoFuncionario.setDataCadastro(OffsetDateTime.now(ZoneId.of("America/Sao_Paulo"))); 
 
         // Lógica do Gestor (Opcional)
         if (request.getCodigoGestor() != null) {
