@@ -4,7 +4,9 @@ import br.com.alltallent.dto.FuncionarioPerfilDTO;
 import br.com.alltallent.model.*;
 import org.junit.jupiter.api.Test;
 
+import java.time.Month;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
@@ -56,7 +58,7 @@ class FuncionarioPerfilDTOTest {
         f.setTituloProfissional("Desenvolvedora");
         f.setResumo("Resumo da Ana");
         f.setLocalizacao("Rio de Janeiro");
-        OffsetDateTime agora = OffsetDateTime.now();
+        OffsetDateTime agora = OffsetDateTime.of(2025, Month.JANUARY.getValue(), 10, 10, 0, 0, 0, ZoneOffset.UTC);
         f.setDataCadastro(agora);
 
         var dto = new FuncionarioPerfilDTO(f);
