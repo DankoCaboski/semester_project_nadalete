@@ -1,6 +1,7 @@
 package br.com.alltallent.config;
 
 import java.security.Key;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,12 +39,13 @@ public class JwtService {
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        Instant now = Instant.now();
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername()) 
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(now.plusMillis(EXPIRATION_TIME)))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -54,11 +56,11 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        return extractExpiration(token).isBefore(Instant.now());
     }
 
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
+    private Instant extractExpiration(String token) {
+        return extractClaim(token, claims -> claims.getExpiration().toInstant());
     }
 
     private Claims extractAllClaims(String token) {
